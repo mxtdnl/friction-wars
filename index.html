@@ -249,18 +249,25 @@ button{font-family:inherit}
   display:block; line-height:1; letter-spacing:.02em; text-transform:uppercase}
 .candidate.chosen .net{color:var(--accent)}
 
-/* per-candidate "why" — the team's own levers that touch THIS action, with the
-   principle each one illustrates. Ties the design decisions to the live bar. */
-.influence{margin:4px 0 10px}
-.inf-head{font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; font-weight:800;
-  color:var(--ink-soft); margin-bottom:4px}
-.inf-item{font-size:.86rem; line-height:1.3; display:flex; gap:8px; align-items:baseline; margin-bottom:3px; color:var(--ink-soft)}
-.inf-item .ar{font-family:var(--font-mono); font-weight:800; flex:0 0 auto; width:1.1em; text-align:center}
-.inf-item b{color:var(--ink); font-weight:700}
-.inf-item.easier .ar{color:var(--success)}
-.inf-item.harder .ar{color:var(--danger)}
-.inf-item.flat .ar{color:var(--warning)}
-.inf-item.none{font-style:italic}
+/* one box per team, at the cue — the team's own levers acting on this decision,
+   each with the principle it illustrates. Pulled out of the choice cards so those
+   stay compact and the habit meters stay on screen. */
+.design-box{margin:0 0 14px; padding:11px 14px; border-radius:var(--r-md);
+  background:var(--surface-sunk); border:1px solid var(--line); border-left:4px solid var(--line-strong)}
+.design-box.empty{color:var(--ink-soft); font-style:italic; font-size:.9rem; line-height:1.35}
+.db-head{font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; font-weight:800;
+  color:var(--ink-soft); margin-bottom:7px}
+.db-item{font-size:.88rem; line-height:1.32; display:flex; gap:8px; align-items:baseline; margin-bottom:5px; color:var(--ink-soft)}
+.db-item:last-child{margin-bottom:0}
+.db-item .ar{font-family:var(--font-mono); font-weight:800; flex:0 0 auto; width:1.1em; text-align:center}
+.db-item b{color:var(--ink); font-weight:700}
+.db-item.easier .ar{color:var(--success)}
+.db-item.harder .ar{color:var(--danger)}
+.db-item.flat .ar{color:var(--warning)}
+.db-tag{font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em;
+  padding:2px 7px; border-radius:var(--r-pill); margin-left:2px; white-space:nowrap}
+.db-tag.neutral{background:var(--neutral-100); color:var(--ink-soft)}
+[data-theme="dark"] .db-tag.neutral{background:var(--line)}
 
 /* the §2 breakdown, read as an equation of colour-coded terms (green lowers
    effort, red raises it). Replaces the old undecodable striped stack. */
@@ -543,7 +550,7 @@ const CONFIG = {
   rematchBudgetCut: 2, // budget reduced by this in a stress rematch
 
   // --- pacing ---
-  autoStepMs:   1900,  // auto-advance interval on the projected screen (21 decision points/week)
+  autoStepMs:   1650,  // auto-advance interval on the projected screen (28 decision points/week)
 };
 
 /* -------------------------------------------------------------------------
@@ -573,16 +580,17 @@ const SCENARIOS = {
     breakLabel:'Late-night snacking', breakSub:'Entrenched and rewarding — starts with high habit strength.',
     budget:10,
     actions:{
-      exercise:{label:'Go for a run',      base:6,   reward:0.45, init:0.05, tag:'build', drive:{morning:1.5, midday:0, evening:0}},
-      skip:    {label:'Stay in bed',       base:2,   reward:0.25, init:0.25, tag:null,    drive:{morning:0.5, midday:0, evening:0}},
-      snack:   {label:'Raid the kitchen',  base:2.5, reward:0.60, init:0.60, tag:'break', drive:{morning:0, midday:1.0, evening:2.0}},
-      tea:     {label:'Skip the snack',     base:3,   reward:0.25, init:0.10, tag:null,    drive:{morning:0, midday:0, evening:0}},
+      exercise:{label:'Go for a run',      base:6,   reward:0.45, init:0.05, tag:'build', drive:{morning:1.5, midday:0.8, afternoon:0, evening:0}},
+      skip:    {label:'Skip the workout',  base:2,   reward:0.25, init:0.25, tag:null,    drive:{morning:0.5, midday:0.3, afternoon:0, evening:0}},
+      snack:   {label:'Raid the kitchen',  base:2.5, reward:0.60, init:0.60, tag:'break', drive:{morning:0, midday:0, afternoon:1.0, evening:2.0}},
+      tea:     {label:'Skip the snack',     base:3,   reward:0.25, init:0.10, tag:null,    drive:{morning:0, midday:0, afternoon:0, evening:0}},
     },
-    // 3 decision points per day (morning build cue; the break habit has two daily cues)
+    // 4 decision points per day: two build cues (morning + lunch) and two break cues (afternoon + evening)
     slots:[
-      {key:'morning', time:'07:00', cue:'alarm goes off, bedroom',  candidates:['exercise','skip']},
-      {key:'midday',  time:'16:00', cue:'afternoon slump, kitchen', candidates:['snack','tea']},
-      {key:'evening', time:'22:30', cue:'wind-down, kitchen',       candidates:['snack','tea']},
+      {key:'morning',  time:'07:00', cue:'alarm goes off, bedroom',  candidates:['exercise','skip']},
+      {key:'midday',   time:'12:30', cue:'lunch break, desk',        candidates:['exercise','skip']},
+      {key:'afternoon',time:'16:00', cue:'afternoon slump, kitchen', candidates:['snack','tea']},
+      {key:'evening',  time:'22:30', cue:'wind-down, kitchen',       candidates:['snack','tea']},
     ],
     // interleaved on purpose — no build/break/pseudo grouping is exposed to designers
     interventions:[
@@ -607,16 +615,17 @@ const SCENARIOS = {
     breakLabel:'Midnight doomscrolling', breakSub:'Entrenched, instantly rewarding, high starting habit.',
     budget:10,
     actions:{
-      deepwork:{label:'Start the focus block', base:6,   reward:0.45, init:0.05, tag:'build', drive:{morning:1.5, midday:0, evening:0}},
-      distract:{label:'Open a social tab',      base:2,   reward:0.25, init:0.30, tag:null,    drive:{morning:0.5, midday:0, evening:0}},
-      scroll:  {label:'Open the feed and scroll',base:2.5,reward:0.58, init:0.60, tag:'break', drive:{morning:0, midday:1.0, evening:2.0}},
-      read:    {label:'Read a paper book',      base:3,   reward:0.25, init:0.10, tag:null,    drive:{morning:0, midday:0, evening:0}},
+      deepwork:{label:'Start the focus block', base:6,   reward:0.45, init:0.05, tag:'build', drive:{morning:1.5, midday:0.8, afternoon:0, evening:0}},
+      distract:{label:'Open a social tab',      base:2,   reward:0.25, init:0.30, tag:null,    drive:{morning:0.5, midday:0.3, afternoon:0, evening:0}},
+      scroll:  {label:'Open the feed and scroll',base:2.5,reward:0.58, init:0.60, tag:'break', drive:{morning:0, midday:0, afternoon:1.0, evening:2.0}},
+      read:    {label:'Read a paper book',      base:3,   reward:0.25, init:0.10, tag:null,    drive:{morning:0, midday:0, afternoon:0, evening:0}},
     },
-    // 3 decision points per day (morning build cue; the scroll habit has two daily cues)
+    // 4 decision points per day: two build cues (morning + after lunch) and two break cues (afternoon + night)
     slots:[
-      {key:'morning', time:'09:00', cue:'desk, laptop open',                 candidates:['deepwork','distract']},
-      {key:'midday',  time:'15:00', cue:'mid-afternoon lull, phone in hand', candidates:['scroll','read']},
-      {key:'evening', time:'23:00', cue:'bed, phone on the nightstand',      candidates:['scroll','read']},
+      {key:'morning',  time:'09:00', cue:'desk, laptop open',                 candidates:['deepwork','distract']},
+      {key:'midday',   time:'14:00', cue:'back from lunch, desk',             candidates:['deepwork','distract']},
+      {key:'afternoon',time:'17:00', cue:'mid-afternoon lull, phone in hand', candidates:['scroll','read']},
+      {key:'evening',  time:'23:00', cue:'bed, phone on the nightstand',      candidates:['scroll','read']},
     ],
     // interleaved on purpose — no build/break/pseudo grouping is exposed to designers
     interventions:[
@@ -836,7 +845,7 @@ function enterBrief(){
   }
   document.getElementById('toDesign').onclick=()=>{ enterDesign(); show('design'); };
 }
-const TOD_LABEL={morning:'Morning', midday:'Afternoon', evening:'Evening'};
+const TOD_LABEL={morning:'Morning', midday:'Lunch', afternoon:'Afternoon', evening:'Evening'};
 
 /* ===================== DESIGN screen ===================== */
 function enterDesign(){
@@ -953,6 +962,7 @@ function buildSimStages(){
         <span class="prob" id="pickcount-${k}"></span>
       </div>
       <div class="cue-line"><span class="clock" id="clock-${k}"></span><span class="txt" id="cue-${k}"></span></div>
+      <div id="design-${k}"></div>
       <div id="cands-${k}"></div>
       <div class="meters">
         <div class="meter build"><div class="ml"><span>Build automaticity</span><span class="val" id="mb-${k}">0%</span></div><div class="track"><div class="fill" id="mbf-${k}"></div></div></div>
@@ -976,7 +986,11 @@ function renderSimStep(){
     // count chosen build actions so far (flywheel evidence)
     let buildPicks=0;
     for(let j=0;j<=i;j++){ if(STATE.sim.results[k].trace[j].chosen===s.build) buildPicks++; }
-    document.getElementById('pickcount-'+k).textContent=`${s.buildLabel.toLowerCase()} chosen ${buildPicks}×`;
+    document.getElementById('pickcount-'+k).textContent=`"${s.actions[s.build].label}" chosen ${buildPicks}×`;
+
+    // the team's levers acting at THIS cue, in their own box above the choices
+    const picks=STATE.teams[k].picks;
+    document.getElementById('design-'+k).innerHTML=designBoxHtml(s, picks, tr);
 
     // candidates. Bar length = effective effort on a scale SHARED across this
     // slot's candidates, so the shortest bar is literally the chosen action.
@@ -984,9 +998,8 @@ function renderSimStep(){
     const effs=tr.rows.map(r=>r.eff);
     const eMin=Math.min(...effs), eMax=Math.max(...effs), range=Math.max(1.5,eMax-eMin);
     const axisMin=eMin-0.28*range, axisMax=eMax+0.14*range; // winner keeps a visible sliver
-    const picks=STATE.teams[k].picks;
     tr.rows.forEach(r=>{
-      wrap.appendChild(candidateEl(r, tr.chosen===r.id, axisMin, axisMax, influenceFor(s, picks, r.id)));
+      wrap.appendChild(candidateEl(r, tr.chosen===r.id, axisMin, axisMax));
     });
     // meters
     setMeter(k,'b', tr.build); setMeter(k,'k', tr.break);
@@ -1008,22 +1021,27 @@ function influenceFor(s, picks, actionId){
   });
   return out;
 }
-function influenceHtml(items, isTarget){
+// The whole cue's design story in one box: every lever the team bought that acts
+// on either action at this decision point, tagged with the action it changes.
+function designBoxHtml(s, picks, tr){
   const kindOf=c=> Math.abs(c)<0.7 ? 'flat' : (c<0 ? 'easier' : 'harder');
   const arrow ={easier:'↓', harder:'↑', flat:'≈'};
+  const items=[];
+  tr.rows.forEach(r=>{ influenceFor(s, picks, r.id).forEach(it=>{
+    items.push({...it, actionLabel:r.label, tag:r.tag}); }); });
   if(!items.length){
-    return isTarget
-      ? `<div class="influence"><div class="inf-head">Your design's effect here</div>
-           <div class="inf-item none"><span class="ar">—</span><span>You changed nothing at this cue — it runs on base effort, habit and the body clock alone.</span></div></div>`
-      : '';
+    return `<div class="design-box empty">Your design changes nothing at this cue — both actions run on base
+      effort, the built-up habit and the body clock alone.</div>`;
   }
   let rows='';
   items.forEach(it=>{ const kind=kindOf(it.contrib);
-    rows+=`<div class="inf-item ${kind}"><span class="ar">${arrow[kind]}</span><span><b>${it.label}</b> — ${it.note}</span></div>`;
+    const tagCls = it.tag==='build' ? 'tag-build' : it.tag==='break' ? 'tag-break' : 'neutral';
+    rows+=`<div class="db-item ${kind}"><span class="ar">${arrow[kind]}</span>
+      <span><b>${it.label}</b> — ${it.note}<span class="db-tag ${tagCls}">${it.actionLabel}</span></span></div>`;
   });
-  return `<div class="influence"><div class="inf-head">Your design's effect here</div>${rows}</div>`;
+  return `<div class="design-box"><div class="db-head">Your design's effect at this cue</div>${rows}</div>`;
 }
-function candidateEl(r, chosen, axisMin, axisMax, influence){
+function candidateEl(r, chosen, axisMin, axisMax){
   const el=document.createElement('div'); el.className='candidate'+(chosen?' chosen':'');
   const tagHtml = r.tag==='build' ? '<span class="tag-pill tag-build">build target</span>'
                 : r.tag==='break' ? '<span class="tag-pill tag-break">break target</span>' : '';
@@ -1050,7 +1068,6 @@ function candidateEl(r, chosen, axisMin, axisMax, influence){
       <span class="cand-name">${r.label}${tagHtml}</span>
       <span class="chosen-flag">◆ chosen</span>
     </div>
-    ${influenceHtml(influence, r.tag!==null)}
     <div class="effbar-row">
       <div class="effbar"><i class="${chosen?'win':'lose'}" style="width:${barPct}%"></i>${zeroTick}</div>
       <span class="net">${r.eff.toFixed(1)}<small>effort</small></span>
