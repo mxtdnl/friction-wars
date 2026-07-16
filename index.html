@@ -398,8 +398,9 @@ button{font-family:inherit}
       <h3 class="mt4" style="margin-bottom:6px">The week at a glance — where decisions happen</h3>
       <div class="week" id="briefWeek"></div>
 
-      <h3 class="mt4" style="margin-bottom:6px">Intervention catalogue</h3>
-      <div class="cat-cols" id="briefCatalogue"></div>
+      <div class="slab callout mt4">Each team gets the <b>same</b> budget and the <b>same</b> list of possible
+        interventions — but you only see that list once you start designing. Decide as a team which changes actually
+        lower the effort <b>at the cue</b>, and which just feel productive. No hints, no labels: that judgement is the game.</div>
 
       <div class="row-actions">
         <button class="btn secondary" data-goto="start">Back</button>
@@ -413,8 +414,8 @@ button{font-family:inherit}
     <div class="center" style="margin-bottom:var(--sp-3)">
       <div class="eyebrow">Design phase</div>
       <h1 style="font-size:clamp(26px,3.6vw,40px)">Spend the budget on the environment</h1>
-      <p class="lede" style="margin:6px auto 0">Teacher enters each team's picks. Real levers move the effort at
-        the decision point; watch the counter — you can't overspend.</p>
+      <p class="lede" style="margin:6px auto 0">Teacher enters each team's picks. No labels and no numbers here —
+        decide which interventions actually lower the effort at the cue. Watch the counter; you can't overspend.</p>
     </div>
     <div class="arena" id="designArena"></div>
     <div class="row-actions" style="justify-content:center">
@@ -505,7 +506,7 @@ const CONFIG = {
   rematchBudgetCut: 2, // budget reduced by this in a stress rematch
 
   // --- pacing ---
-  autoStepMs:   2300,  // auto-advance interval on the projected screen
+  autoStepMs:   1900,  // auto-advance interval on the projected screen (21 decision points/week)
 };
 
 /* -------------------------------------------------------------------------
@@ -535,24 +536,29 @@ const SCENARIOS = {
     breakLabel:'Late-night snacking', breakSub:'Entrenched and rewarding — starts with high habit strength.',
     budget:10,
     actions:{
-      exercise:{label:'Go for a run',      base:6,   reward:0.45, init:0.05, tag:'build', drive:{morning:1.5, evening:0}},
-      skip:    {label:'Stay in bed',       base:2,   reward:0.25, init:0.25, tag:null,    drive:{morning:0.5, evening:0}},
-      snack:   {label:'Raid the kitchen',  base:2.5, reward:0.60, init:0.60, tag:'break', drive:{morning:0, evening:2.0}},
-      tea:     {label:'Herbal tea, then bed',base:3, reward:0.25, init:0.10, tag:null,    drive:{morning:0, evening:0}},
+      exercise:{label:'Go for a run',      base:6,   reward:0.45, init:0.05, tag:'build', drive:{morning:1.5, midday:0, evening:0}},
+      skip:    {label:'Stay in bed',       base:2,   reward:0.25, init:0.25, tag:null,    drive:{morning:0.5, midday:0, evening:0}},
+      snack:   {label:'Raid the kitchen',  base:2.5, reward:0.60, init:0.60, tag:'break', drive:{morning:0, midday:1.0, evening:2.0}},
+      tea:     {label:'Skip the snack',     base:3,   reward:0.25, init:0.10, tag:null,    drive:{morning:0, midday:0, evening:0}},
     },
-    morningCue:'alarm goes off, bedroom', morningCandidates:['exercise','skip'], morningTime:'07:00',
-    eveningCue:'wind-down, kitchen',      eveningCandidates:['snack','tea'],     eveningTime:'22:30',
+    // 3 decision points per day (morning build cue; the break habit has two daily cues)
+    slots:[
+      {key:'morning', time:'07:00', cue:'alarm goes off, bedroom',  candidates:['exercise','skip']},
+      {key:'midday',  time:'16:00', cue:'afternoon slump, kitchen', candidates:['snack','tea']},
+      {key:'evening', time:'22:30', cue:'wind-down, kitchen',       candidates:['snack','tea']},
+    ],
+    // interleaved on purpose — no build/break/pseudo grouping is exposed to designers
     interventions:[
       {id:'kit',   label:'Lay out kit the night before', cost:2, target:'exercise', mod:-3.0, note:'Cuts the number of steps between cue and action.'},
-      {id:'shoes', label:'Running shoes by the front door', cost:1, target:'exercise', mod:-1.5, note:'Removes a small search cost — small levers still count.'},
-      {id:'class', label:'Book a class with a friend', cost:3, target:'exercise', mod:-2.0, mod2Target:'skip', mod2:2.0, note:'Commitment device: also raises the effort of skipping (social cost).'},
-      {id:'sleepkit',label:'Sleep in your gym clothes', cost:2, target:'exercise', mod:-2.5, note:'Pre-loads the routine so waking = ready.'},
       {id:'cancel',label:'Cancel the snack delivery subscription', cost:3, target:'snack', mod:4.0, note:'Removes the option upstream of the cue.'},
-      {id:'tin',   label:'Snacks in an opaque tin, high shelf', cost:2, target:'snack', mod:2.5, note:'Out of sight and out of reach adds friction at the moment.'},
-      {id:'dontbuy',label:"Don't buy the snacks on the weekly shop", cost:3, target:'snack', mod:3.5, note:'Design the choice out of the house entirely.'},
       {id:'goal',  label:'Set a motivational goal / resolution', cost:1, target:'exercise', mod:0, pseudo:true, note:'Willpower is not a friction lever — nothing at the cue changed.'},
+      {id:'shoes', label:'Running shoes by the front door', cost:1, target:'exercise', mod:-1.5, note:'Removes a small search cost — small levers still count.'},
+      {id:'tin',   label:'Snacks in an opaque tin, high shelf', cost:2, target:'snack', mod:2.5, note:'Out of sight and out of reach adds friction at the moment.'},
       {id:'tracker',label:'Buy a premium fitness tracker', cost:4, target:'exercise', mod:-0.5, pseudo:true, note:'A gadget does not reduce friction at the decision point.'},
+      {id:'class', label:'Book a class with a friend', cost:3, target:'exercise', mod:-2.0, mod2Target:'skip', mod2:2.0, note:'Commitment device: also raises the effort of skipping (social cost).'},
+      {id:'dontbuy',label:"Don't buy the snacks on the weekly shop", cost:3, target:'snack', mod:3.5, note:'Design the choice out of the house entirely.'},
       {id:'poster',label:'Motivational poster on the wall', cost:2, target:'exercise', mod:-0.3, pseudo:true, note:'Motivation display ≠ lower effort to act.'},
+      {id:'sleepkit',label:'Sleep in your gym clothes', cost:2, target:'exercise', mod:-2.5, note:'Pre-loads the routine so waking = ready.'},
     ],
   },
   focus: {
@@ -564,34 +570,40 @@ const SCENARIOS = {
     breakLabel:'Midnight doomscrolling', breakSub:'Entrenched, instantly rewarding, high starting habit.',
     budget:10,
     actions:{
-      deepwork:{label:'Start the focus block', base:6,   reward:0.45, init:0.05, tag:'build', drive:{morning:1.5, evening:0}},
-      distract:{label:'Open a social tab',      base:2,   reward:0.25, init:0.30, tag:null,    drive:{morning:0.5, evening:0}},
-      scroll:  {label:'Doomscroll in bed',      base:2.5, reward:0.58, init:0.60, tag:'break', drive:{morning:0, evening:2.0}},
-      read:    {label:'Read a paper book',      base:3,   reward:0.25, init:0.10, tag:null,    drive:{morning:0, evening:0}},
+      deepwork:{label:'Start the focus block', base:6,   reward:0.45, init:0.05, tag:'build', drive:{morning:1.5, midday:0, evening:0}},
+      distract:{label:'Open a social tab',      base:2,   reward:0.25, init:0.30, tag:null,    drive:{morning:0.5, midday:0, evening:0}},
+      scroll:  {label:'Open the feed and scroll',base:2.5,reward:0.58, init:0.60, tag:'break', drive:{morning:0, midday:1.0, evening:2.0}},
+      read:    {label:'Read a paper book',      base:3,   reward:0.25, init:0.10, tag:null,    drive:{morning:0, midday:0, evening:0}},
     },
-    morningCue:'desk, laptop open', morningCandidates:['deepwork','distract'], morningTime:'09:00',
-    eveningCue:'bed, phone on the nightstand', eveningCandidates:['scroll','read'], eveningTime:'23:00',
+    // 3 decision points per day (morning build cue; the scroll habit has two daily cues)
+    slots:[
+      {key:'morning', time:'09:00', cue:'desk, laptop open',                 candidates:['deepwork','distract']},
+      {key:'midday',  time:'15:00', cue:'mid-afternoon lull, phone in hand', candidates:['scroll','read']},
+      {key:'evening', time:'23:00', cue:'bed, phone on the nightstand',      candidates:['scroll','read']},
+    ],
+    // interleaved on purpose — no build/break/pseudo grouping is exposed to designers
     interventions:[
       {id:'onetab', label:'Close every tab but the work one', cost:2, target:'deepwork', mod:-3.0, note:'Fewer steps between sitting down and starting.'},
-      {id:'outline',label:'Notes & outline ready the night before', cost:2, target:'deepwork', mod:-2.0, note:'Removes the cold-start cost.'},
-      {id:'phoneroom',label:'Phone in another room while working', cost:2, target:'deepwork', mod:-3.0, mod2Target:'distract', mod2:2.0, note:'Also raises the effort of the distraction (must get up).'},
-      {id:'blocker',label:'Website blocker on social sites', cost:3, target:'deepwork', mod:-3.0, mod2Target:'distract', mod2:2.5, note:'Blocks the low-effort escape at the cue.'},
       {id:'chargeout',label:'Charge the phone outside the bedroom', cost:3, target:'scroll', mod:4.0, note:'Removes the option from arm’s reach.'},
-      {id:'grey', label:'Greyscale display after 22:00', cost:2, target:'scroll', mod:2.5, note:'Dulls the reward and adds friction to the loop.'},
-      {id:'delapp',label:'Delete the apps, browser only', cost:3, target:'scroll', mod:3.5, note:'Design the frictionless path out of existence.'},
       {id:'fgoal', label:'Set an ambitious focus goal', cost:1, target:'deepwork', mod:0, pseudo:true, note:'A goal changes nothing at the cue.'},
+      {id:'outline',label:'Notes & outline ready the night before', cost:2, target:'deepwork', mod:-2.0, note:'Removes the cold-start cost.'},
+      {id:'grey', label:'Greyscale display after 22:00', cost:2, target:'scroll', mod:2.5, note:'Dulls the reward and adds friction to the loop.'},
       {id:'phones',label:'Buy noise-cancelling headphones', cost:4, target:'deepwork', mod:-0.5, pseudo:true, note:'A gadget is not a friction lever.'},
+      {id:'phoneroom',label:'Phone in another room while working', cost:2, target:'deepwork', mod:-3.0, mod2Target:'distract', mod2:2.0, note:'Also raises the effort of the distraction (must get up).'},
+      {id:'delapp',label:'Delete the apps, browser only', cost:3, target:'scroll', mod:3.5, note:'Design the frictionless path out of existence.'},
       {id:'wall',  label:'Productivity quote as wallpaper', cost:2, target:'deepwork', mod:-0.3, pseudo:true, note:'Display ≠ lower effort to start.'},
+      {id:'blocker',label:'Website blocker on social sites', cost:3, target:'deepwork', mod:-3.0, mod2Target:'distract', mod2:2.5, note:'Blocks the low-effort escape at the cue.'},
     ],
   },
 };
 
-/* Build the ordered week (7 days × 2 decision points) for a scenario. */
+/* Build the ordered week (7 days × N decision points) from the scenario's slots. */
 function buildWeek(sc){
   const week=[];
   for(let d=0; d<7; d++){
-    week.push({day:d, timeOfDay:'morning', time:sc.morningTime, cue:sc.morningCue, candidates:sc.morningCandidates.slice()});
-    week.push({day:d, timeOfDay:'evening', time:sc.eveningTime, cue:sc.eveningCue, candidates:sc.eveningCandidates.slice()});
+    for(const s of sc.slots){
+      week.push({day:d, timeOfDay:s.key, time:s.time, cue:s.cue, candidates:s.candidates.slice()});
+    }
   }
   return week;
 }
@@ -776,44 +788,18 @@ function enterBrief(){
   document.getElementById('briefBreak').textContent=s.breakLabel;
   document.getElementById('briefBreakSub').textContent=s.breakSub;
   document.getElementById('briefBudget').textContent=STATE.budget+' pts';
-  // week strip
+  // week strip — one row per decision-point slot
   const w=document.getElementById('briefWeek'); w.innerHTML='';
   for(let d=0; d<7; d++){
     const c=document.createElement('div'); c.className='dayc';
-    c.innerHTML=`<h4>DAY ${d+1}</h4>
-      <div class="cue"><span class="t">${s.morningTime}</span><span>${s.morningCue}</span></div>
-      <div class="cue"><span class="t">${s.eveningTime}</span><span>${s.eveningCue}</span></div>`;
+    let cues=`<h4>DAY ${d+1}</h4>`;
+    s.slots.forEach(sl=>{ cues+=`<div class="cue"><span class="t">${sl.time}</span><span>${sl.cue}</span></div>`; });
+    c.innerHTML=cues;
     w.appendChild(c);
   }
-  // catalogue
-  const cat=document.getElementById('briefCatalogue'); cat.innerHTML='';
-  const cols=[
-    {title:'Real levers — build target', filter:iv=>!iv.pseudo && iv.target===s.build, cls:''},
-    {title:'Real levers — break target', filter:iv=>!iv.pseudo && iv.target===s.break, cls:''},
-    {title:'Pseudo-levers — the traps', filter:iv=>iv.pseudo, cls:'pseudo'},
-  ];
-  cols.forEach(col=>{
-    const d=document.createElement('div'); d.className='cat-col '+col.cls;
-    d.innerHTML=`<h3>${col.title}</h3>`;
-    s.interventions.filter(col.filter).forEach(iv=>{
-      d.appendChild(leverRow(iv));
-    });
-    cat.appendChild(d);
-  });
   document.getElementById('toDesign').onclick=()=>{ enterDesign(); show('design'); };
 }
-function modText(iv){
-  if(iv.mod===0) return {t:'no effect', c:'nil'};
-  if(iv.mod<0)   return {t:(iv.mod).toFixed(1)+' effort', c:'down'};
-  return {t:'+'+iv.mod.toFixed(1)+' effort', c:'up'};
-}
-function leverRow(iv){
-  const el=document.createElement('div'); el.className='lever';
-  const m=modText(iv);
-  el.innerHTML=`<span class="name">${iv.label}${iv.pseudo?' <span class="mono" style="color:var(--warning)">⚠</span>':''}</span>
-    <span><span class="cost">${iv.cost} pt</span> · <span class="mod ${m.c}">${m.t}</span></span>`;
-  return el;
-}
+const TOD_LABEL={morning:'Morning', midday:'Afternoon', evening:'Evening'};
 
 /* ===================== DESIGN screen ===================== */
 function enterDesign(){
@@ -828,28 +814,23 @@ function enterDesign(){
 function teamDesignPanel(key){
   const s=sc(), team=STATE.teams[key];
   const panel=document.createElement('div'); panel.className='team-panel'; panel.dataset.team=key;
-  const groups=[
-    {label:'Build-target levers', filter:iv=>!iv.pseudo && iv.target===s.build},
-    {label:'Break-target levers', filter:iv=>!iv.pseudo && iv.target===s.break},
-    {label:'Other options', filter:iv=>iv.pseudo},
-  ];
+  // Flat, interleaved list. No category grouping and no modifier/pseudo hints are
+  // shown here — teams must judge which interventions change the effort at the cue.
+  // The effort each one actually applies is revealed live in the simulation and the debrief.
   let inner=`<div class="team-head">
       <span class="team-name" style="color:${key==='A'?'var(--series-build)':'var(--series-break)'}">${STATE.mode==='collaborative'?'Class design':team.name}</span>
       <span class="budget-badge mono" id="badge-${key}"></span>
+    </div>
+    <div class="pick-group">`;
+  s.interventions.forEach(iv=>{
+    const on=team.picks.includes(iv.id);
+    inner+=`<div class="pick${on?' on':''}" data-team="${key}" data-iv="${iv.id}" role="checkbox" aria-checked="${on}" tabindex="0">
+      <span class="box"><svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg></span>
+      <span class="pl"><b>${iv.label}</b></span>
+      <span class="pc">${iv.cost} pt</span>
     </div>`;
-  groups.forEach(g=>{
-    inner+=`<div class="pick-group"><div class="glabel">${g.label}</div>`;
-    s.interventions.filter(g.filter).forEach(iv=>{
-      const on=team.picks.includes(iv.id);
-      const m=modText(iv);
-      inner+=`<div class="pick${on?' on':''}${iv.pseudo?' pseudo':''}" data-team="${key}" data-iv="${iv.id}" role="checkbox" aria-checked="${on}" tabindex="0">
-        <span class="box"><svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg></span>
-        <span class="pl"><b>${iv.label}</b><small class="mod ${m.c}">${m.t}${iv.pseudo?' · pseudo-lever':''}</small></span>
-        <span class="pc">${iv.cost} pt</span>
-      </div>`;
-    });
-    inner+=`</div>`;
   });
+  inner+=`</div>`;
   panel.innerHTML=inner;
   panel.querySelectorAll('.pick').forEach(p=>{
     const toggle=()=>togglePick(p.dataset.team,p.dataset.iv);
@@ -949,7 +930,7 @@ function renderSimStep(){
   document.getElementById('simProgress').style.width = ((i+1)/total*100)+'%';
   const day = STATE.sim.results[TEAM_KEYS()[0]].trace[i].day;
   const tod = STATE.sim.results[TEAM_KEYS()[0]].trace[i].timeOfDay;
-  document.getElementById('simDayFlag').textContent=`Day ${day+1} · ${tod==='morning'?'Morning':'Evening'}`;
+  document.getElementById('simDayFlag').textContent=`Day ${day+1} · ${TOD_LABEL[tod]||tod}`;
 
   TEAM_KEYS().forEach(k=>{
     const tr=STATE.sim.results[k].trace[i];
