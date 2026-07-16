@@ -249,6 +249,19 @@ button{font-family:inherit}
   display:block; line-height:1; letter-spacing:.02em; text-transform:uppercase}
 .candidate.chosen .net{color:var(--accent)}
 
+/* per-candidate "why" — the team's own levers that touch THIS action, with the
+   principle each one illustrates. Ties the design decisions to the live bar. */
+.influence{margin:4px 0 10px}
+.inf-head{font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; font-weight:800;
+  color:var(--ink-soft); margin-bottom:4px}
+.inf-item{font-size:.86rem; line-height:1.3; display:flex; gap:8px; align-items:baseline; margin-bottom:3px; color:var(--ink-soft)}
+.inf-item .ar{font-family:var(--font-mono); font-weight:800; flex:0 0 auto; width:1.1em; text-align:center}
+.inf-item b{color:var(--ink); font-weight:700}
+.inf-item.easier .ar{color:var(--success)}
+.inf-item.harder .ar{color:var(--danger)}
+.inf-item.flat .ar{color:var(--warning)}
+.inf-item.none{font-style:italic}
+
 /* the §2 breakdown, read as an equation of colour-coded terms (green lowers
    effort, red raises it). Replaces the old undecodable striped stack. */
 .breakdown{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
@@ -971,8 +984,9 @@ function renderSimStep(){
     const effs=tr.rows.map(r=>r.eff);
     const eMin=Math.min(...effs), eMax=Math.max(...effs), range=Math.max(1.5,eMax-eMin);
     const axisMin=eMin-0.28*range, axisMax=eMax+0.14*range; // winner keeps a visible sliver
+    const picks=STATE.teams[k].picks;
     tr.rows.forEach(r=>{
-      wrap.appendChild(candidateEl(r, tr.chosen===r.id, axisMin, axisMax));
+      wrap.appendChild(candidateEl(r, tr.chosen===r.id, axisMin, axisMax, influenceFor(s, picks, r.id)));
     });
     // meters
     setMeter(k,'b', tr.build); setMeter(k,'k', tr.break);
@@ -983,7 +997,33 @@ function setMeter(k, which, v){
   document.getElementById('m'+which+'-'+k).textContent=pct+'%';
   document.getElementById('m'+which+'f-'+k).style.width=pct+'%';
 }
-function candidateEl(r, chosen, axisMin, axisMax){
+// Which of a team's chosen interventions act on this action, and how (a lever's
+// primary target, or its secondary effect e.g. a commitment device raising the
+// effort of the skip). Returns the plain-language principle for each.
+function influenceFor(s, picks, actionId){
+  const out=[];
+  picks.forEach(id=>{ const iv=s.interventions.find(x=>x.id===id); if(!iv) return;
+    if(iv.target===actionId)          out.push({label:iv.label, note:iv.note, contrib:iv.mod});
+    else if(iv.mod2Target===actionId) out.push({label:iv.label, note:iv.note, contrib:iv.mod2});
+  });
+  return out;
+}
+function influenceHtml(items, isTarget){
+  const kindOf=c=> Math.abs(c)<0.7 ? 'flat' : (c<0 ? 'easier' : 'harder');
+  const arrow ={easier:'↓', harder:'↑', flat:'≈'};
+  if(!items.length){
+    return isTarget
+      ? `<div class="influence"><div class="inf-head">Your design's effect here</div>
+           <div class="inf-item none"><span class="ar">—</span><span>You changed nothing at this cue — it runs on base effort, habit and the body clock alone.</span></div></div>`
+      : '';
+  }
+  let rows='';
+  items.forEach(it=>{ const kind=kindOf(it.contrib);
+    rows+=`<div class="inf-item ${kind}"><span class="ar">${arrow[kind]}</span><span><b>${it.label}</b> — ${it.note}</span></div>`;
+  });
+  return `<div class="influence"><div class="inf-head">Your design's effect here</div>${rows}</div>`;
+}
+function candidateEl(r, chosen, axisMin, axisMax, influence){
   const el=document.createElement('div'); el.className='candidate'+(chosen?' chosen':'');
   const tagHtml = r.tag==='build' ? '<span class="tag-pill tag-build">build target</span>'
                 : r.tag==='break' ? '<span class="tag-pill tag-break">break target</span>' : '';
@@ -1010,6 +1050,7 @@ function candidateEl(r, chosen, axisMin, axisMax){
       <span class="cand-name">${r.label}${tagHtml}</span>
       <span class="chosen-flag">◆ chosen</span>
     </div>
+    ${influenceHtml(influence, r.tag!==null)}
     <div class="effbar-row">
       <div class="effbar"><i class="${chosen?'win':'lose'}" style="width:${barPct}%"></i>${zeroTick}</div>
       <span class="net">${r.eff.toFixed(1)}<small>effort</small></span>
