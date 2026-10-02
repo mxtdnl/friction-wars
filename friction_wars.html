@@ -320,8 +320,6 @@ button{font-family:inherit}
 @media (prefers-reduced-motion: reduce){
   *{transition:none !important; animation:none !important}
 }
-.event-line{max-width:900px; margin:0 auto var(--sp-2); padding:10px 16px; border-radius:var(--r-md);
-  background:var(--warning-soft); color:var(--ink); text-align:center; font-weight:600}
 .name-input{font:inherit; color:inherit; background:transparent; border:none; border-bottom:1.5px dashed var(--line-strong);
   width:10ch; padding:0}
 .preds{margin-top:var(--sp-2); padding-top:var(--sp-2); border-top:1.5px solid var(--line)}
@@ -334,6 +332,34 @@ input[type=range]{width:100%; accent-color:var(--accent)}
 .questions{margin:0; padding-left:1.3em}
 .questions li{margin-bottom:10px; max-width:75ch}
 .scorecard .grade{color:var(--accent)}
+.timeline{display:grid; grid-template-columns:repeat(14,1fr); gap:6px; max-width:900px; margin:var(--sp-2) auto 6px}
+.tl-day{display:flex; flex-direction:column; align-items:center; gap:3px}
+.tl-pair{display:flex; gap:3px; width:100%}
+.tl-cell{flex:1; height:22px; border-radius:4px; border:1.5px solid var(--line-strong); background:var(--surface); cursor:pointer; padding:0}
+.tl-cell.past{background:var(--surface-sunk)}
+.tl-cell.bad{background:var(--danger); border-color:var(--danger)}
+.tl-cell.good{background:var(--success); border-color:var(--success)}
+.tl-cell.cur{outline:3px solid var(--accent); outline-offset:2px}
+.tl-n{font-family:var(--font-mono); font-size:.7rem; color:var(--ink-soft)}
+.tl-key{display:flex; gap:18px; flex-wrap:wrap; justify-content:center; font-size:.8rem; color:var(--ink-soft); margin:0 auto var(--sp-2); max-width:900px}
+.tl-key span{display:inline-flex; align-items:center; gap:6px}
+.tl-dot{width:12px; height:12px; border-radius:3px; display:inline-block}
+.tl-dot.bad{background:var(--danger)} .tl-dot.good{background:var(--success)}
+.event-banner{max-width:900px; margin:0 auto var(--sp-2); padding:14px 20px; border-radius:var(--r-md); border:2px solid var(--line)}
+.event-banner.none{color:var(--ink-soft); text-align:center; font-size:.92rem; border-style:dashed}
+.event-banner.bad{background:var(--danger-soft); border-color:var(--danger)}
+.event-banner.good{background:var(--success-soft); border-color:var(--success)}
+.eb-tag{font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; font-weight:800}
+.event-banner.bad .eb-tag{color:var(--danger)} .event-banner.good .eb-tag{color:var(--success)}
+.eb-text{font-family:var(--font-display); font-weight:800; font-size:1.3rem; line-height:1.2; margin:4px 0}
+.eb-fx{font-family:var(--font-mono); font-size:.88rem}
+.dayc .cue.ev{border-radius:4px; padding:2px 4px; margin-left:-4px; margin-right:-4px; font-weight:700}
+.dayc .cue.ev.bad{background:var(--danger-soft); color:var(--danger)}
+.dayc .cue.ev.good{background:var(--success-soft); color:var(--success)}
+.dayc .muted{color:var(--ink-soft)}
+.term.today{border-width:2px; font-weight:800; box-shadow:0 0 0 2px var(--warning-soft)}
+.transport .btn:disabled{opacity:.4}
+@media(max-width:560px){.timeline{gap:2px} .tl-pair{gap:1px}}
 @media(max-width:560px){.week{grid-template-columns:repeat(2,1fr)} .app{padding-left:16px;padding-right:16px} .topbar,.brand{flex-wrap:wrap}}
 </style>
 </head>
@@ -419,11 +445,12 @@ input[type=range]{width:100%; accent-color:var(--accent)}
       </div>
 
       <h3 class="mt4" style="margin-bottom:6px">Sam's fortnight: two decisions a day</h3>
+      <div class="tl-key" id="briefKey" style="justify-content:flex-start;margin-left:0"></div>
       <div class="week" id="briefWeek"></div>
 
       <div class="slab callout mt4">Each team gets the <b>same</b> budget and the <b>same</b> list of cards, shown when
-        you start designing. The cards are not labelled. Your task is to decide which of them change the effort at
-        13:00 and 22:30.</div>
+        you start designing. The cards are not labelled and the budget will not cover everything that works. Your task
+        is to decide which cards change the effort at 13:00 and 22:30, on the days that matter.</div>
 
       <div class="row-actions">
         <button class="btn secondary" data-goto="start">Back</button>
@@ -454,15 +481,15 @@ input[type=range]{width:100%; accent-color:var(--accent)}
       <div class="eyebrow">Simulation</div>
       <h1 style="font-size:clamp(24px,3.2vw,36px)">Sam takes the shorter bar, every time</h1>
     </div>
-    <div class="progress-line"><i id="simProgress"></i></div>
+    <div class="timeline" id="timeline" aria-label="Decisions in the fortnight"></div>
+    <div class="tl-key"><span><i class="tl-dot bad"></i> Disruption</span><span><i class="tl-dot good"></i> Helpful event</span><span>Click a square to jump to that decision</span></div>
     <div class="transport">
-      <button class="icon-btn" id="simPrev" aria-label="Previous decision">&lsaquo;</button>
-      <button class="btn secondary" id="simPlay">Pause</button>
+      <button class="btn secondary" id="simPrev">Previous decision</button>
       <div class="dayflag" id="simDayFlag">Day 1</div>
-      <button class="icon-btn" id="simNext" aria-label="Next decision">&rsaquo;</button>
+      <button class="btn" id="simNext">Next decision</button>
       <button class="btn secondary" id="simSkip">Skip to results</button>
     </div>
-    <div class="event-line" id="simEvent" aria-live="polite"></div>
+    <div id="simEvent" aria-live="polite"></div>
     <div class="sim-legend">
       <span class="key"><span class="swatch win"></span> The shorter bar wins</span>
       <span class="key"><span class="swatch easier"></span> lowers effort</span>
@@ -514,7 +541,7 @@ input[type=range]{width:100%; accent-color:var(--accent)}
 "use strict";
 
 /* Model settings. These are teaching values, not measurements. */
-const MODEL = { kHabit:6, learn:0.35, decay:0.92, stack:0.72, days:14, budget:10, autoStepMs:1650 };
+const MODEL = { kHabit:6, learn:0.35, decay:0.92, stack:0.72, days:14, budget:9 };
 const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
 const SCENARIO = {
@@ -535,28 +562,35 @@ const SCENARIO = {
     {key:'evening', time:'22:30', cue:'In bed, phone on the table', candidates:['email','read']},
   ],
   events:[
-    {day:2,  slot:'lunch',   action:'walk',  mod:1.5,  short:'Offsite',      text:'Leadership offsite. Sessions run straight through lunch.'},
-    {day:3,  slot:'lunch',   action:'walk',  mod:1.5,  short:'Offsite',      text:'Leadership offsite. Sessions run straight through lunch.'},
-    {day:2,  slot:'evening', action:'email', mod:-1.5, short:'Late dinner',  text:'The offsite dinner ends late and the discussion carries on over email.'},
-    {day:3,  slot:'evening', action:'email', mod:-1.5, short:'Late dinner',  text:'The offsite dinner ends late and the discussion carries on over email.'},
-    {day:4,  slot:'evening', action:'email', mod:3,    short:'Quiet evening',text:'A quiet evening. Very little new email.'},
-    {day:5,  slot:'evening', action:'email', mod:3,    short:'Quiet evening',text:'A quiet evening. Very little new email.'},
-    {day:5,  slot:'lunch',   action:'walk',  mod:-1.5, short:'Weekend',      text:'Weekend. No meetings at lunchtime.'},
-    {day:6,  slot:'lunch',   action:'walk',  mod:-1.5, short:'Weekend',      text:'Weekend. No meetings at lunchtime.'},
+    {day:2,  slot:'lunch',   action:'walk',  mod:1.5,  short:'Offsite',          text:'Leadership offsite. Sessions run straight through lunch.'},
+    {day:3,  slot:'lunch',   action:'walk',  mod:1.5,  short:'Offsite',          text:'Leadership offsite. Sessions run straight through lunch.'},
+    {day:2,  slot:'evening', action:'email', mod:-1.5, short:'Offsite dinner',   text:'The offsite dinner ends late and the discussion carries on over email.'},
+    {day:3,  slot:'evening', action:'email', mod:-1.5, short:'Offsite dinner',   text:'The offsite dinner ends late and the discussion carries on over email.'},
+    {day:4,  slot:'evening', action:'email', mod:3,    short:'Quiet evening',    text:'A quiet evening. Very little new email.'},
+    {day:5,  slot:'evening', action:'email', mod:3,    short:'Quiet evening',    text:'A quiet evening. Very little new email.'},
+    {day:5,  slot:'lunch',   action:'walk',  mod:-1.5, short:'Weekend',          text:'Weekend. No meetings at lunchtime.'},
+    {day:6,  slot:'lunch',   action:'walk',  mod:-1.5, short:'Weekend',          text:'Weekend. No meetings at lunchtime.'},
+    {day:7,  slot:'lunch',   action:'walk',  mod:2,    short:'Board preparation',text:'Board preparation. A working lunch is booked over the walk.'},
     {day:8,  slot:'lunch',   action:'walk',  mod:2,    short:'Regional problem', text:'A problem in one region. Back-to-back calls over lunch.'},
-    {day:9,  slot:'evening', action:'email', mod:-1.5, short:'Results day',  text:'Quarterly results day. The pull to check email tonight is stronger.'},
-    {day:11, slot:'evening', action:'email', mod:3,    short:'Quiet evening',text:'A quiet evening. Very little new email.'},
-    {day:12, slot:'evening', action:'email', mod:3,    short:'Quiet evening',text:'A quiet evening. Very little new email.'},
-    {day:12, slot:'lunch',   action:'walk',  mod:-1.5, short:'Weekend',      text:'Weekend. No meetings at lunchtime.'},
-    {day:13, slot:'lunch',   action:'walk',  mod:-1.5, short:'Weekend',      text:'Weekend. No meetings at lunchtime.'},
+    {day:9,  slot:'evening', action:'email', mod:-1.5, short:'Results day',      text:'Quarterly results day. The pull to check email tonight is stronger.'},
+    {day:10, slot:'evening', action:'email', mod:-1.5, short:'Late call',        text:'A call with the US team runs until 22:00. The inbox is full afterwards.'},
+    {day:11, slot:'evening', action:'email', mod:3,    short:'Quiet evening',    text:'A quiet evening. Very little new email.'},
+    {day:12, slot:'evening', action:'email', mod:3,    short:'Quiet evening',    text:'A quiet evening. Very little new email.'},
+    {day:12, slot:'lunch',   action:'walk',  mod:-1.5, short:'Weekend',          text:'Weekend. No meetings at lunchtime.'},
+    {day:13, slot:'lunch',   action:'walk',  mod:-1.5, short:'Weekend',          text:'Weekend. No meetings at lunchtime.'},
   ],
   // listed in mixed order on purpose; the design screen shows no types or numbers
   interventions:[
+    {id:'tracker',label:'Wear a fitness tracker that buzzes at 13:00 to remind you to move', cost:3, target:'walk', mod:-0.5, pseudo:true, note:'Walking takes 0.5 points less effort. The reminder arrives, but leaving the desk is almost as hard as before.'},
     {id:'block',  label:'Block 13:00 to 13:15 in your diary so no meetings land there', cost:2, target:'walk', mod:-3.0, note:'Walking takes 3 points less effort. There is no meeting to move first.'},
+    {id:'massage',label:'Book a monthly massage', cost:2, target:null, mod:0, pseudo:true, note:'It may feel restorative, but it changes nothing at 13:00 or 22:30.'},
     {id:'nophone',label:'Remove work email from your personal phone', cost:3, target:'email', mod:3.5, note:'Email in bed takes 3.5 points more effort. It needs the laptop.'},
-    {id:'goal',   label:'Make "more recovery" a personal objective for the quarter', cost:1, target:'walk', mod:0, pseudo:true, note:'Changes nothing at 13:00 or 22:30. Both options take the same effort as before.'},
+    {id:'detox',  label:'Make weekends phone-free', cost:3, target:'email', mod:4, days:[5,6,12,13], note:'Email in bed takes 4 points more effort, but only on Saturday and Sunday nights. On weekday nights nothing changes.'},
+    {id:'goal',   label:'Make "more recovery" a personal objective for the quarter', cost:1, target:null, mod:0, pseudo:true, note:'Changes nothing at 13:00 or 22:30. Both options take the same effort as before.'},
     {id:'route',  label:'Pick one 15-minute route from the office door', cost:1, target:'walk', mod:-1.5, note:'Walking takes 1.5 points less effort. There is nothing to decide.'},
+    {id:'night',  label:'Turn on night mode on your phone after 21:00', cost:2, target:'email', mod:0.5, pseudo:true, note:'Email in bed takes 0.5 points more effort. The screen is dimmer; the inbox is still one tap away.'},
     {id:'charge', label:'Charge the phone outside the bedroom', cost:2, target:'email', mod:2.5, note:'Email in bed takes 2.5 points more effort.'},
+    {id:'book',   label:'Read a book on sleep and recovery', cost:1, target:null, mod:0, pseudo:true, note:'Sam knows more, but both options take the same effort as before.'},
     {id:'coffee', label:'End the walk at the best coffee nearby', cost:2, target:'walk', mod:0, reward:2, note:'Each walk builds the habit twice as fast. It does nothing until Sam takes the first walk.'},
     {id:'buddy',  label:'Agree to walk with a colleague who calls for you at 13:00', cost:3, target:'walk', mod:-2.0, mod2Target:'desk', mod2:2.0, note:'Walking takes 2 points less effort and staying at the desk takes 2 more. Someone is waiting.'},
     {id:'coat',   label:'Keep a coat and walking shoes at the office', cost:2, target:'walk', mod:-2.5, note:'Walking takes 2.5 points less effort.'},
@@ -583,19 +617,20 @@ function combine(mods){
 function frictionMap(s, picks, extra){
   const lists={};
   const add=(a,m)=>{ if(m) (lists[a]=lists[a]||[]).push(m); };
-  picks.forEach(id=>{ const iv=s.interventions.find(x=>x.id===id); if(!iv) return;
+  picks.forEach(id=>{ const iv=s.interventions.find(x=>x.id===id); if(!iv || !iv.target) return;
     add(iv.target, iv.mod); if(iv.mod2Target) add(iv.mod2Target, iv.mod2); });
   (extra||[]).forEach(([a,m])=>add(a,m));
   const map={}; for(const k in lists) map[k]=combine(lists[k]);
   return map;
 }
+const activeOn=(s, picks, day)=>picks.filter(id=>{ const iv=s.interventions.find(x=>x.id===id); return iv && (!iv.days || iv.days.includes(day)); });
 function simulate(s, picks, extra){
-  const fmap=frictionMap(s, picks, extra);
   const reward={}, habit={};
   for(const id in s.actions){ reward[id]=s.actions[id].reward; habit[id]=s.actions[id].init; }
   picks.forEach(id=>{ const iv=s.interventions.find(x=>x.id===id); if(iv && iv.reward) reward[iv.target]*=iv.reward; });
   const trace=[];
   buildFortnight(s).forEach((dp,i)=>{
+    const fmap=frictionMap(s, activeOn(s, picks, dp.day), extra);
     const rows=dp.candidates.map(cid=>{
       const A=s.actions[cid];
       const friction=fmap[cid]||0;
@@ -613,7 +648,7 @@ function simulate(s, picks, extra){
       else habit[r.id]*=MODEL.decay;
     }
     trace.push({i, day:dp.day, slot:dp.slot, time:dp.time, cue:dp.cue,
-      events:s.events.filter(e=>e.day===dp.day && e.slot===dp.slot).map(e=>e.text),
+      events:s.events.filter(e=>e.day===dp.day && e.slot===dp.slot),
       rows, chosen:pick.id, build:habit[s.build], break:habit[s.break]});
   });
   const builds=trace.filter(t=>t.chosen===s.build).length;
@@ -625,7 +660,7 @@ function simulate(s, picks, extra){
 const STATE = {
   mode:'competitive',
   teams:{ A:{name:'Team 1', picks:[], pred:{}}, B:{name:'Team 2', picks:[], pred:{}} },
-  sim:null, simIndex:0, playing:false, timer:null,
+  sim:null, simIndex:0,
 };
 const TEAM_KEYS = () => STATE.mode==='competitive' ? ['A','B'] : ['A'];
 const teamName = k => STATE.mode==='collaborative' ? 'The room' : STATE.teams[k].name;
@@ -642,7 +677,6 @@ function show(screen){
     el.classList.toggle('active', idx===cur);
     el.classList.toggle('done', idx<cur);
   });
-  stopPlay();
   window.scrollTo({top:0, behavior: reduced()?'auto':'smooth'});
 }
 const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -674,12 +708,14 @@ function enterBrief(){
   $('briefBreakSub').textContent=s.breakSub;
   $('briefBudget').textContent=MODEL.budget+' pts';
   const w=$('briefWeek'); w.innerHTML='';
+  $('briefKey').innerHTML='<span><i class="tl-dot bad"></i> Disruption: makes the old habit easier</span><span><i class="tl-dot good"></i> Helpful: makes recovery easier</span>';
   for(let d=0; d<MODEL.days; d++){
     const c=document.createElement('div'); c.className='dayc';
     let h=`<h4>DAY ${d+1} · ${DAY_NAMES[d%7].toUpperCase()}</h4>`;
     s.slots.forEach(sl=>{
       const ev=s.events.find(e=>e.day===d && e.slot===sl.key);
-      h+=`<div class="cue"><span class="t">${sl.time}</span><span>${ev?ev.short:'&nbsp;'}</span></div>`;
+      h+= ev ? `<div class="cue ev ${eventKind(s,ev)}"><span class="t">${sl.time}</span><span>${ev.short}</span></div>`
+             : `<div class="cue"><span class="t">${sl.time}</span><span class="muted">Ordinary</span></div>`;
     });
     c.innerHTML=h; w.appendChild(c);
   }
@@ -760,8 +796,8 @@ function startSimulation(){
   STATE.simIndex=0;
   buildSimStages();
   renderSimStep();
+  buildTimeline();
   show('sim');
-  setTimeout(startPlay, 500);
 }
 function buildSimStages(){
   const grid=$('simGrid');
@@ -786,11 +822,12 @@ function buildSimStages(){
 }
 function renderSimStep(){
   const s=sc(), i=STATE.simIndex, first=STATE.sim.results[TEAM_KEYS()[0]].trace;
-  $('simProgress').style.width=((i+1)/first.length*100)+'%';
   const t0=first[i];
   $('simDayFlag').textContent=`Day ${t0.day+1} · ${DAY_NAMES[t0.day%7]} ${t0.time}`;
-  $('simEvent').textContent=t0.events.join(' ');
-  $('simEvent').classList.toggle('hidden', !t0.events.length);
+  $('simEvent').innerHTML=eventBanner(s, t0);
+  document.querySelectorAll('#timeline .tl-cell').forEach((c,j)=>{ c.classList.toggle('cur', j===i); c.classList.toggle('past', j<i); });
+  $('simPrev').disabled = i===0;
+  $('simNext').disabled = i===first.length-1;
   TEAM_KEYS().forEach(k=>{
     const tr=STATE.sim.results[k].trace, t=tr[i];
     $('clock-'+k).textContent=t.time;
@@ -817,6 +854,7 @@ function designBoxHtml(s, picks, t){
   t.rows.forEach(r=>{
     picks.forEach(id=>{
       const iv=s.interventions.find(x=>x.id===id);
+      if(iv.days && !iv.days.includes(t.day)) return;
       let c=null;
       if(iv.target===r.id) c=iv.mod; else if(iv.mod2Target===r.id) c=iv.mod2;
       if(c===null) return;
@@ -842,7 +880,7 @@ function candidateEl(r, chosen, axisMin, axisMax){
   if(Math.abs(r.friction)>0.05) terms.push(signed(r.friction,'your cards'));
   if(r.habitBonus>0.05) terms.push(signed(-r.habitBonus,'habit'));
   if(r.drive>0.05) terms.push(signed(-r.drive,'time of day'));
-  if(Math.abs(r.event)>0.05) terms.push(signed(r.event,'today'));
+  if(Math.abs(r.event)>0.05) terms.push(signed(r.event,'today').replace('class="term ','class="term today '));
   terms.push(`<span class="term eq"><b>= ${r.eff.toFixed(1)}</b> <small>effort</small></span>`);
   el.innerHTML=`
     <div class="cand-top"><span class="cand-name">${r.label}${tagHtml}</span><span class="chosen-flag">Chosen</span></div>
@@ -853,22 +891,39 @@ function candidateEl(r, chosen, axisMin, axisMax){
     <div class="breakdown">${terms.join('')}</div>`;
   return el;
 }
-function startPlay(){
-  if(STATE.playing) return;
-  STATE.playing=true; setPlayLabel();
-  if(reduced()) return;
-  STATE.timer=setInterval(()=>{
-    if(STATE.simIndex>=STATE.sim.results[TEAM_KEYS()[0]].trace.length-1){ stopPlay(); return; }
-    STATE.simIndex++; renderSimStep();
-  }, MODEL.autoStepMs);
+function eventKind(s, e){
+  // a disruption helps the old habit: harder walk, or easier email
+  const helpsOld = (e.action===s.build && e.mod>0) || (e.action===s.break && e.mod<0);
+  return helpsOld ? 'bad' : 'good';
 }
-function stopPlay(){ STATE.playing=false; if(STATE.timer){clearInterval(STATE.timer); STATE.timer=null;} setPlayLabel(); }
-function setPlayLabel(){ const b=$('simPlay'); if(b) b.textContent=STATE.playing?'Pause':'Play'; }
+function eventEffect(s, e){
+  const label=s.actions[e.action].label.toLowerCase();
+  return `${label.charAt(0).toUpperCase()+label.slice(1)}: ${Math.abs(e.mod)} points ${e.mod>0?'more':'less'} effort today.`;
+}
+function eventBanner(s, t){
+  if(!t.events.length) return `<div class="event-banner none">An ordinary ${t.slot==='lunch'?'lunchtime':'evening'}. Nothing outside Sam's control is happening.</div>`;
+  return t.events.map(e=>{ const k=eventKind(s,e);
+    return `<div class="event-banner ${k}"><div class="eb-tag">${k==='bad'?'Disruption':'Helpful event'}</div>
+      <div class="eb-text">${e.text}</div><div class="eb-fx">${eventEffect(s,e)}</div></div>`; }).join('');
+}
+function buildTimeline(){
+  const s=sc(), tr=STATE.sim.results[TEAM_KEYS()[0]].trace;
+  let h='';
+  for(let d=0; d<MODEL.days; d++){
+    h+=`<div class="tl-day"><div class="tl-pair">`;
+    tr.filter(t=>t.day===d).forEach(t=>{
+      const k=t.events.length?eventKind(s,t.events[0]):'';
+      h+=`<button class="tl-cell ${k}" data-i="${t.i}" title="Day ${d+1} ${t.time}${t.events.length?': '+t.events[0].short:''}" aria-label="Day ${d+1} ${t.time}${t.events.length?', '+t.events[0].short:''}"></button>`;
+    });
+    h+=`</div><div class="tl-n">${d+1}</div></div>`;
+  }
+  $('timeline').innerHTML=h;
+  $('timeline').querySelectorAll('.tl-cell').forEach(c=>c.onclick=()=>{ STATE.simIndex=+c.dataset.i; renderSimStep(); });
+}
 function bindSimTransport(){
-  $('simPlay').onclick=()=>{ STATE.playing?stopPlay():startPlay(); };
-  $('simNext').onclick=()=>{ stopPlay(); const n=STATE.sim.results[TEAM_KEYS()[0]].trace.length; if(STATE.simIndex<n-1){STATE.simIndex++; renderSimStep();} };
-  $('simPrev').onclick=()=>{ stopPlay(); if(STATE.simIndex>0){STATE.simIndex--; renderSimStep();} };
-  $('simSkip').onclick=()=>{ stopPlay(); enterResult(); show('result'); };
+  $('simNext').onclick=()=>{ const n=STATE.sim.results[TEAM_KEYS()[0]].trace.length; if(STATE.simIndex<n-1){STATE.simIndex++; renderSimStep();} };
+  $('simPrev').onclick=()=>{ if(STATE.simIndex>0){STATE.simIndex--; renderSimStep();} };
+  $('simSkip').onclick=()=>{ enterResult(); show('result'); };
 }
 
 /* ---------- results ---------- */
@@ -877,10 +932,11 @@ function summary(k){
   const ivs=picks.map(id=>s.interventions.find(x=>x.id===id));
   const spent=ivs.reduce((t,iv)=>t+iv.cost,0);
   const wasted=ivs.filter(iv=>iv.pseudo).reduce((t,iv)=>t+iv.cost,0);
-  const touchesBuild=ivs.some(iv=>iv.target===s.build && iv.mod<0);
-  const touchesBreak=ivs.some(iv=>iv.target===s.break);
+  const touchesBuild=ivs.some(iv=>iv.target===s.build && iv.mod<0 && !iv.pseudo);
+  const touchesBreak=ivs.some(iv=>iv.target===s.break && !iv.pseudo);
+  const weekendOnly=ivs.some(iv=>iv.days);
   const idleReward=ivs.some(iv=>iv.reward) && r.builds===0;
-  return {r, ivs, spent, wasted, touchesBuild, touchesBreak, idleReward, total:r.builds+r.breaks};
+  return {r, ivs, spent, wasted, touchesBuild, touchesBreak, weekendOnly, idleReward, total:r.builds+r.breaks};
 }
 function enterResult(){
   const grid=$('resultGrid');
@@ -914,16 +970,19 @@ function scorecard(k, m, isWinner){
       <div class="row"><span>Walks outside</span><span class="mono">${m.r.builds} of 14${vs(m.r.builds,pred.build)}</span></div>
       <div class="row"><span>Nights without email</span><span class="mono">${m.r.breaks} of 14${vs(m.r.breaks,pred.break)}</span></div>
       <div class="row"><span>With no changes</span><span class="mono">${STATE.sim.baseline.builds} and ${STATE.sim.baseline.breaks}</span></div>
-      <div class="row"><span>Points on cards that changed nothing</span><span class="mono">${m.wasted} of ${m.spent}</span></div>
+      <div class="row"><span>Points on cards with little or no effect</span><span class="mono">${m.wasted} of ${m.spent}</span></div>
     </div>
     <div class="debrief"><h4>What each card did</h4>${items}</div>`;
   return el;
 }
 function notesFor(k, m){
   const n=[], who=teamName(k);
-  if(m.wasted) n.push(`${who} spent ${m.wasted} pt on a card that changed nothing at 13:00 or 22:30.`);
-  if(m.ivs.length && !m.touchesBuild) n.push(`${who} bought nothing that made the walk easier, so the walk never started.`);
-  if(m.ivs.length && !m.touchesBreak) n.push(`${who} bought nothing that made email in bed harder, so that habit stayed.`);
+  if(m.wasted) n.push(`${who} spent ${m.wasted} of ${MODEL.budget} pt on cards that changed little or nothing at 13:00 or 22:30.`);
+  if(m.weekendOnly) n.push(`${who}'s phone-free weekends acted on 4 of the 14 nights; the weekday nights kept the habit going.`);
+  if(m.ivs.length && !m.touchesBuild) n.push(`${who} bought nothing that made the walk meaningfully easier, so the walk never started.`);
+  if(m.ivs.length && !m.touchesBreak) n.push(`${who} bought nothing that made email in bed meaningfully harder, so that habit stayed.`);
+  if(m.touchesBuild && m.r.builds===0) n.push(`${who}'s walk cards did not lower the effort enough for a first walk, so the walk never started.`);
+  if(m.touchesBreak && m.r.breaks===0) n.push(`${who}'s evening cards did not make email hard enough to stop even once.`);
   if(m.idleReward) n.push(`${who}'s coffee card did nothing, because Sam never took a first walk to reward.`);
   const s=sc(), tr=m.r.trace;
   const first=pred=>{ const t=tr.find(pred); return t ? t.day+1 : null; };
@@ -1014,6 +1073,11 @@ function boot(){
   initStart();
   document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.goto)));
   bindSimTransport();
+  document.addEventListener('keydown',e=>{
+    if($('screen-sim').classList.contains('hidden') || e.target.tagName==='INPUT') return;
+    if(e.key==='ArrowRight') $('simNext').click();
+    if(e.key==='ArrowLeft') $('simPrev').click();
+  });
   show('start');
   window.FrictionWars={check, simulate, SCENARIO, MODEL, STATE};
 }
