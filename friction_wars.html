@@ -1,725 +1,1007 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Friction Wars</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  color-scheme: light;
-  --paper:#f6f4ef;
-  --white:#ffffff;
-  --ink:#1b1b1b;
-  --ink-2:#555049;
-  --rule:#d6d1c7;
-  --off:#e4e0d8;
-  --g1:#0072b2;
-  --g2:#d55e00;
-  --g3:#009e73;
-  --g4:#cc79a7;
-  --font:'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  
+  --sage-50:#f2f5ef; --sage-100:#e4ebde; --sage-200:#cbd8c2; --sage-300:#aec19f;
+  --sage-400:#93a983; --sage-500:#7c9070; --sage-600:#647459; --sage-700:#4e5a46;
+  --sage-800:#3a4335; --sage-900:#272e24;
+  
+  --purple-50:#f1ecf7; --purple-100:#e3d8ef; --purple-200:#c8b4de; --purple-300:#ab8ecb;
+  --purple-400:#9374b9; --purple-500:#7b5ea7; --purple-600:#644a8a; --purple-700:#4d3a6b;
+  --purple-800:#392b50; --purple-900:#261d36;
+  
+  --neutral-0:#fbfcfa; --neutral-50:#f4f6f2; --neutral-100:#e9ede6; --neutral-200:#d6ddd1;
+  --neutral-300:#b6c0af; --neutral-400:#8b9682; --neutral-500:#6b7563; --neutral-700:#434b3d;
+  --neutral-900:#20261c;
+  
+  --success:#5f8a52; --success-soft:#dfe9d8;
+  --warning:#b8863b;  --warning-soft:#f0e3cd;   
+  --danger:#a4553f;   --danger-soft:#eeddd6;     
+
+  
+  --bg:var(--neutral-50);
+  --surface:var(--neutral-0);
+  --surface-sunk:var(--sage-50);
+  --ink:var(--neutral-900);
+  --ink-soft:var(--neutral-500);
+  --line:var(--neutral-200);
+  --line-strong:var(--sage-300);
+  --primary:var(--sage-600);
+  --primary-ink:#fff;
+  --accent:var(--purple-500);
+
+  
+  --series-build:var(--sage-500);
+  --series-break:var(--purple-500);
+  --seg-base:var(--neutral-400);
+  --seg-friction-up:var(--danger);
+  --seg-friction-down:var(--success);
+  --seg-habit:var(--sage-500);
+  --seg-drive:var(--warning);
+
+  
+  --r-sm:8px; --r-md:14px; --r-lg:22px; --r-pill:999px;
+  --sp-1:6px; --sp-2:12px; --sp-3:18px; --sp-4:28px; --sp-5:42px;
+  --font-display:'Futura','Century Gothic','Trebuchet MS','Segoe UI',system-ui,sans-serif;
+  --font-body:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',sans-serif;
+  --font-mono:'DejaVu Sans Mono','SFMono-Regular','Consolas',monospace;
+  --shadow:0 2px 0 var(--sage-200), 0 10px 26px -14px rgba(39,46,36,.35);
+}
+[data-theme="dark"]{
+  
+  --bg:#1b201a; --surface:#232a20; --surface-sunk:#1f251c;
+  --ink:#eef1ea; --ink-soft:#a7b29d; --line:#333c2e; --line-strong:#48543f;
+  --primary:var(--sage-400); --primary-ink:#1b201a; --accent:var(--purple-300);
+  --series-build:var(--sage-300); --series-break:var(--purple-300);
+  --seg-base:#6b7563; --seg-friction-up:#c9765c; --seg-friction-down:#7aa869;
+  --seg-habit:var(--sage-400); --seg-drive:#cf9f52;
+  --success:#7aa869; --success-soft:#2c3826;
+  --warning:#cf9f52; --warning-soft:#3a3220;
+  --danger:#c9765c;  --danger-soft:#3a2820;
+  --shadow:0 2px 0 #171c15, 0 12px 30px -16px rgba(0,0,0,.6);
 }
 *{box-sizing:border-box}
-html{font-size:clamp(16px,1.45vw,30px)}
-body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--font); line-height:1.4}
-h1,h2,h3{margin:0; line-height:1.15; font-weight:700}
-h1{font-size:2rem}
-h2{font-size:1.35rem}
-h3{font-size:1.05rem}
-p{margin:0 0 .8rem}
-button,input{font:inherit; color:inherit}
-:focus-visible{outline:3px solid var(--ink); outline-offset:3px}
-
-.page{max-width:66rem; margin:0 auto; padding:1.2rem 1.5rem 3rem}
-header.top{display:flex; justify-content:space-between; align-items:baseline; gap:1rem;
-  border-bottom:2px solid var(--ink); padding-bottom:.5rem; margin-bottom:1.6rem}
-header.top .name{font-weight:700; font-size:1.1rem}
-header.top .step{color:var(--ink-2); font-size:.85rem}
-
-.btn{background:var(--ink); color:var(--white); border:2px solid var(--ink); border-radius:4px;
-  padding:.45rem 1.1rem; cursor:pointer; font-weight:700}
-.btn:hover{background:#000}
-.btn.plain{background:var(--white); color:var(--ink)}
-.btn.plain:hover{background:var(--off)}
-.btn:disabled{opacity:.4; cursor:not-allowed}
-.actions{display:flex; gap:.8rem; justify-content:space-between; align-items:center; margin-top:1.6rem; flex-wrap:wrap}
-.actions .right{display:flex; gap:.8rem; margin-left:auto}
-
-.lead{font-size:1.1rem; max-width:44rem}
-.muted{color:var(--ink-2)}
-.small{font-size:.85rem}
-.hidden{display:none !important}
-
-/* setup */
-.setup{display:grid; grid-template-columns:1fr 1fr; gap:2rem}
-@media(max-width:760px){.setup{grid-template-columns:1fr}}
-fieldset{border:none; margin:0 0 1.2rem; padding:0}
-legend{font-weight:700; margin-bottom:.5rem}
-.choice{display:flex; gap:.6rem; align-items:flex-start; padding:.6rem .7rem; border:1px solid var(--rule);
-  background:var(--white); border-radius:4px; margin-bottom:.5rem; cursor:pointer}
-.choice input{margin-top:.3rem; width:1rem; height:1rem; accent-color:var(--ink)}
-.choice span{display:block}
-.counts{display:flex; gap:.5rem}
-.counts label{border:1px solid var(--rule); background:var(--white); border-radius:4px; padding:.3rem .9rem; cursor:pointer}
-.counts input{accent-color:var(--ink)}
-.names{display:grid; gap:.5rem}
-.names label{display:flex; align-items:center; gap:.6rem}
-.names .sw{width:.9rem; height:.9rem; border-radius:2px; flex:0 0 auto}
-.names input{flex:1; padding:.3rem .5rem; border:1px solid var(--rule); border-radius:4px; background:var(--white)}
-.notes{border-top:1px solid var(--rule); padding-top:1rem; margin-top:1rem}
-.notes ol{margin:.3rem 0 0; padding-left:1.3rem}
-.notes li{margin-bottom:.3rem}
-
-/* effort bars on the rule screen */
-.choicepoint{background:var(--white); border:1px solid var(--rule); border-radius:4px; padding:1rem 1.2rem; margin-bottom:1rem}
-.choicepoint .when{font-weight:700; margin-bottom:.6rem}
-.bar-row{display:grid; grid-template-columns:14rem 1fr; gap:.8rem; align-items:center; margin-bottom:.45rem}
-@media(max-width:760px){.bar-row{grid-template-columns:1fr}}
-.bar{height:1.1rem; background:var(--off); border-radius:2px}
-.bar i{display:block; height:100%; background:var(--ink-2); border-radius:2px}
-.bar-row.wins .bar i{background:var(--ink)}
-.bar-row.wins .lab{font-weight:700}
-.gapline{margin-top:.5rem; color:var(--ink-2)}
-
-/* calendars */
-.cal{display:grid; grid-template-columns:9rem repeat(14,1fr); gap:3px; align-items:center}
-.cal .rl{font-size:.8rem; padding-right:.4rem}
-.cal .c{aspect-ratio:1; border:1px solid var(--rule); background:var(--white); border-radius:2px}
-.cal .c.no{background:var(--off); border-color:var(--off)}
-.cal .dn{font-size:.62rem; text-align:center; color:var(--ink-2)}
-.big-result{font-size:1.4rem; font-weight:700; margin:1rem 0 .4rem}
-
-/* design matrix */
-table.matrix{width:100%; border-collapse:collapse; background:var(--white); border:1px solid var(--rule)}
-.matrix th,.matrix td{padding:.45rem .6rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:middle}
-.matrix thead th{border-bottom:2px solid var(--ink); font-size:.9rem}
-.matrix td.cost{white-space:nowrap; color:var(--ink-2); width:4rem}
-.matrix td.tick,.matrix th.tick{text-align:center; width:8rem}
-.matrix input[type=checkbox]{width:1.15rem; height:1.15rem; accent-color:var(--ink); cursor:pointer}
-.matrix input[type=checkbox]:disabled{cursor:not-allowed}
-.matrix input[type=number]{width:4rem; padding:.2rem .3rem; border:1px solid var(--rule); border-radius:4px; text-align:center}
-.matrix tr.sum td{font-weight:700; border-top:2px solid var(--ink)}
-.matrix tr.pred td{background:var(--paper)}
-.matrix .over{color:var(--g2)}
-.th-team{display:inline-flex; align-items:center; gap:.4rem}
-.th-team .sw{width:.8rem; height:.8rem; border-radius:2px}
-
-/* reveal */
-.dayhead{display:flex; justify-content:space-between; align-items:baseline; gap:1rem; flex-wrap:wrap; margin-bottom:.4rem}
-.dayhead h2{font-size:1.5rem}
-.events{min-height:2.6rem; margin-bottom:1rem; color:var(--ink-2)}
-.events div{margin-bottom:.15rem}
-.teams{display:grid; grid-template-columns:repeat(2,1fr); gap:1.2rem}
-.teams.one{grid-template-columns:1fr}
-@media(max-width:900px){.teams{grid-template-columns:1fr}}
-.team{background:var(--white); border:1px solid var(--rule); border-radius:4px; padding:.9rem 1rem}
-.team h3{display:flex; align-items:center; gap:.5rem; margin-bottom:.6rem}
-.team h3 .sw{width:.9rem; height:.9rem; border-radius:2px}
-.team .tally{font-size:.85rem; margin-top:.5rem}
-.team .tally b{font-size:1rem}
-.team .log{font-size:.8rem; margin-top:.5rem; min-height:1.2rem}
-.team .log div{margin-bottom:.15rem}
-.gap svg{display:block; width:100%; height:auto; margin-top:.6rem}
-.controls{display:flex; gap:.6rem; align-items:center; flex-wrap:wrap}
-
-/* debrief */
-section.block{margin-top:2rem}
-section.block > h2{margin-bottom:.7rem}
-table.cards{width:100%; border-collapse:collapse; background:var(--white); border:1px solid var(--rule)}
-.cards th,.cards td{padding:.5rem .6rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top}
-.cards thead th{border-bottom:2px solid var(--ink); font-size:.9rem}
-.cards td.kind{font-size:.85rem; color:var(--ink-2); width:11rem}
-.dots{display:flex; flex-direction:column; gap:.2rem; font-size:.85rem}
-.by{display:inline-flex; align-items:center; gap:.35rem; white-space:nowrap}
-.dot{width:.85rem; height:.85rem; border-radius:2px; display:inline-block}
-.slider-wrap{background:var(--white); border:1px solid var(--rule); border-radius:4px; padding:1rem 1.2rem}
-.slider-wrap input[type=range]{width:100%; accent-color:var(--ink)}
-.slider-read{display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap; font-weight:700; margin:.4rem 0 .8rem}
-.questions ol{padding-left:1.3rem; margin:0}
-.questions li{margin-bottom:.7rem; max-width:48rem}
-details{background:var(--white); border:1px solid var(--rule); border-radius:4px; padding:.7rem 1rem}
-details summary{cursor:pointer; font-weight:700}
-details p,details li{font-size:.9rem}
-
-/* print: cards and prediction sheets only */
-#print{display:none}
-@media print{
-  @page{size:A4; margin:12mm}
-  html{font-size:12pt}
-  body{background:#fff}
-  .page{display:none}
-  #print{display:block}
-  .pcards{display:grid; grid-template-columns:1fr 1fr; gap:0}
-  .pcard{height:62mm; border:1px dashed #999; padding:6mm; display:flex; flex-direction:column; justify-content:space-between; break-inside:avoid}
-  .pcard .t{font-size:15pt; font-weight:700; line-height:1.2}
-  .pcard .k{font-size:11pt; color:#444}
-  .pcard .cost{align-self:flex-end; font-size:20pt; font-weight:700}
-  .psheet{break-before:page}
-  .psheet h2{font-size:18pt; margin-bottom:6mm}
-  .psheet p{font-size:12pt}
-  .psheet .line{border-bottom:1px solid #000; height:12mm; margin-bottom:4mm}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body);
+  font-size:clamp(15px,1.05vw,19px); line-height:1.5; -webkit-font-smoothing:antialiased;
+  min-height:100vh;
 }
-@media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+h1,h2,h3{font-family:var(--font-display); font-weight:800; letter-spacing:.01em; line-height:1.05; margin:0}
+.mono{font-family:var(--font-mono); font-variant-numeric:tabular-nums}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--accent); outline-offset:2px; border-radius:var(--r-sm)}
+
+.app{max-width:1280px; margin:0 auto; padding:var(--sp-3) var(--sp-4) var(--sp-5)}
+.topbar{display:flex; align-items:center; gap:var(--sp-3); padding:var(--sp-2) 0 var(--sp-3)}
+.brand{display:flex; align-items:baseline; gap:10px}
+.brand .mark{
+  font-family:var(--font-display); font-weight:800; font-size:clamp(24px,2.6vw,34px);
+  color:var(--ink); letter-spacing:-.01em;
+}
+.brand .mark em{color:var(--accent); font-style:normal}
+.brand .tag{color:var(--ink-soft); font-size:.82rem; letter-spacing:.14em; text-transform:uppercase}
+.topbar .spacer{flex:1}
+.ghost-btn{
+  background:transparent; border:1.5px solid var(--line-strong); color:var(--ink);
+  border-radius:var(--r-pill); padding:8px 16px; cursor:pointer; font-weight:600; font-size:.9rem;
+  display:inline-flex; align-items:center; gap:8px; transition:background .18s,border-color .18s;
+}
+.ghost-btn:hover{background:var(--surface-sunk); border-color:var(--sage-400)}
+
+.rail{display:flex; gap:2px; margin:0 0 var(--sp-4); flex-wrap:wrap}
+.rail .step{
+  flex:1 1 0; min-width:110px; padding:8px 12px; border-top:3px solid var(--line);
+  color:var(--ink-soft); font-size:.78rem; letter-spacing:.06em; text-transform:uppercase; font-weight:700;
+  display:flex; align-items:center; gap:8px;
+}
+.rail .step .n{font-family:var(--font-mono); opacity:.8}
+.rail .step.done{border-top-color:var(--sage-400); color:var(--ink)}
+.rail .step.active{border-top-color:var(--accent); color:var(--ink)}
+
+.btn{
+  border:none; border-radius:var(--r-pill); padding:13px 26px; font-weight:800; cursor:pointer;
+  font-size:1rem; background:var(--primary); color:var(--primary-ink); box-shadow:var(--shadow);
+  transition:transform .12s cubic-bezier(.34,1.56,.64,1), filter .15s; letter-spacing:.01em;
+}
+.btn:hover{filter:brightness(1.05)} .btn:active{transform:translateY(2px) scale(.99)}
+.btn.big{padding:16px 36px; font-size:1.15rem}
+.btn.accent{background:var(--accent)}
+.btn:disabled{opacity:.45; cursor:not-allowed; box-shadow:none}
+.btn.secondary{background:var(--surface); color:var(--ink); border:1.5px solid var(--line-strong); box-shadow:none}
+
+.slab{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--r-lg); padding:var(--sp-4)}
+.hero{display:grid; grid-template-columns:1.15fr .85fr; gap:var(--sp-4); align-items:center}
+@media(max-width:820px){.hero{grid-template-columns:1fr}}
+.eyebrow{color:var(--accent); font-weight:800; letter-spacing:.16em; text-transform:uppercase; font-size:.8rem}
+.display-xl{font-size:clamp(38px,6vw,74px); line-height:.95; margin:10px 0 14px}
+.lede{font-size:1.1rem; color:var(--ink-soft); max-width:44ch}
+
+.mode-set{display:flex; flex-direction:column; gap:12px; margin:var(--sp-3) 0}
+.opt{
+  display:flex; gap:14px; align-items:flex-start; padding:14px 16px; border:2px solid var(--line);
+  border-radius:var(--r-md); cursor:pointer; background:var(--surface); transition:border-color .15s,background .15s;
+}
+.opt:hover{border-color:var(--sage-400)}
+.opt.sel{border-color:var(--accent); background:var(--surface-sunk)}
+.opt .dot{width:22px;height:22px;border-radius:var(--r-pill);border:2.5px solid var(--line-strong);flex:0 0 auto;margin-top:2px;position:relative}
+.opt.sel .dot{border-color:var(--accent)}
+.opt.sel .dot::after{content:"";position:absolute;inset:3px;border-radius:var(--r-pill);background:var(--accent)}
+.opt b{font-size:1.02rem}
+.opt p{margin:2px 0 0;color:var(--ink-soft);font-size:.9rem}
+
+.targets{display:flex; gap:var(--sp-3); flex-wrap:wrap; margin:var(--sp-2) 0}
+.target{flex:1 1 240px; border-radius:var(--r-md); padding:16px 18px; border:2px solid var(--line)}
+.target.build{border-left:6px solid var(--series-build)}
+.target.break{border-left:6px solid var(--series-break)}
+.target .k{font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--ink-soft)}
+.target.build .k{color:var(--series-build)} .target.break .k{color:var(--series-break)}
+.target .v{font-family:var(--font-display);font-weight:800;font-size:1.35rem;margin-top:4px}
+.target .sub{color:var(--ink-soft);font-size:.9rem;margin-top:4px}
+
+.week{display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-top:var(--sp-2)}
+@media(max-width:720px){.week{grid-template-columns:repeat(4,1fr)}}
+.dayc{background:var(--surface-sunk); border:1.5px solid var(--line); border-radius:var(--r-sm); padding:10px 8px}
+.dayc h4{font-family:var(--font-mono);font-size:.8rem;color:var(--ink-soft);margin:0 0 6px;letter-spacing:.04em}
+.dayc .cue{font-size:.78rem;line-height:1.25;margin-bottom:5px;display:flex;gap:6px}
+.dayc .cue .t{font-family:var(--font-mono);color:var(--accent);font-weight:700}
+
+.cat-cols{display:grid; grid-template-columns:1fr 1fr 1fr; gap:var(--sp-3)}
+@media(max-width:900px){.cat-cols{grid-template-columns:1fr}}
+.cat-col h3{font-size:1rem; margin-bottom:10px; padding-bottom:6px; border-bottom:2px solid var(--line-strong)}
+.cat-col.pseudo h3{color:var(--warning); border-bottom-color:var(--warning)}
+.lever{
+  display:flex; justify-content:space-between; gap:10px; align-items:baseline; padding:9px 0;
+  border-bottom:1px dashed var(--line);
+}
+.lever .name{font-size:.92rem}
+.lever .cost{font-family:var(--font-mono); font-weight:700; color:var(--ink-soft); white-space:nowrap}
+.lever .mod{font-family:var(--font-mono); font-size:.82rem; white-space:nowrap}
+.mod.down{color:var(--success)} .mod.up{color:var(--danger)} .mod.nil{color:var(--warning)}
+
+.arena{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-3)}
+.arena.solo{grid-template-columns:1fr; max-width:760px; margin:0 auto}
+@media(max-width:900px){.arena{grid-template-columns:1fr}}
+.team-panel{background:var(--surface); border:2px solid var(--line); border-radius:var(--r-lg); padding:var(--sp-3)}
+.team-panel[data-team="A"]{border-top:6px solid var(--series-build)}
+.team-panel[data-team="B"]{border-top:6px solid var(--series-break)}
+.team-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:var(--sp-2)}
+.team-name{font-family:var(--font-display); font-weight:800; font-size:1.3rem}
+.budget-badge{font-family:var(--font-mono); font-weight:800; padding:6px 12px; border-radius:var(--r-pill);
+  background:var(--surface-sunk); border:1.5px solid var(--line-strong)}
+.budget-badge.over{background:var(--danger-soft); border-color:var(--danger); color:var(--danger)}
+.pick-group{margin-bottom:14px}
+.pick-group > .glabel{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--ink-soft);margin-bottom:6px}
+.pick{
+  display:flex; gap:10px; align-items:center; padding:8px 10px; border-radius:var(--r-sm);
+  border:1.5px solid var(--line); margin-bottom:6px; cursor:pointer; transition:background .14s,border-color .14s;
+}
+.pick:hover{background:var(--surface-sunk)}
+.pick.on{border-color:var(--sage-500); background:var(--surface-sunk)}
+.pick.on.pseudo{border-color:var(--warning)}
+.pick .box{width:20px;height:20px;border-radius:6px;border:2px solid var(--line-strong);flex:0 0 auto;display:grid;place-items:center}
+.pick.on .box{background:var(--sage-500);border-color:var(--sage-500)}
+.pick.on.pseudo .box{background:var(--warning);border-color:var(--warning)}
+.pick .box svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:3;opacity:0}
+.pick.on .box svg{opacity:1}
+.pick .pl{flex:1}
+.pick .pl b{font-weight:600;font-size:.92rem}
+.pick .pl small{display:block;color:var(--ink-soft);font-size:.78rem}
+.pick .pc{font-family:var(--font-mono);font-weight:700;font-size:.85rem;color:var(--ink-soft);text-align:right}
+.pick.disabled{opacity:.4;pointer-events:none}
+
+.sim-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-3)}
+.sim-grid.solo{grid-template-columns:1fr; max-width:820px; margin:0 auto}
+@media(max-width:980px){.sim-grid{grid-template-columns:1fr}}
+.stage{background:var(--surface); border:2px solid var(--line); border-radius:var(--r-lg); padding:var(--sp-3); position:relative; overflow:hidden}
+.stage[data-team="A"]{border-top:6px solid var(--series-build)}
+.stage[data-team="B"]{border-top:6px solid var(--series-break)}
+.cue-line{display:flex; align-items:center; gap:10px; margin-bottom:12px}
+.cue-line .clock{font-family:var(--font-mono);font-weight:800;font-size:1.1rem;color:var(--accent);
+  background:var(--surface-sunk);border:1.5px solid var(--line-strong);border-radius:var(--r-sm);padding:4px 10px}
+.cue-line .txt{font-weight:600}
+.candidate{margin-bottom:12px; padding:10px 12px; border-radius:var(--r-md); border:2px solid var(--line);
+  background:var(--surface); transition:border-color .2s, background .2s, transform .2s}
+.candidate.chosen{border-color:var(--accent); background:var(--surface-sunk); transform:translateY(-1px)}
+.cand-top{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px}
+.cand-name{font-weight:700}
+.cand-name .tag-pill{font-size:.66rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+  padding:2px 7px; border-radius:var(--r-pill); margin-left:8px; vertical-align:middle}
+.tag-build{background:var(--sage-100); color:var(--sage-700)}
+.tag-break{background:var(--purple-100); color:var(--purple-700)}
+[data-theme="dark"] .tag-build{background:var(--sage-800);color:var(--sage-100)}
+[data-theme="dark"] .tag-break{background:var(--purple-800);color:var(--purple-100)}
+.chosen-flag{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);opacity:0}
+.candidate.chosen .chosen-flag{opacity:1}
+
+.effbar-row{display:flex; align-items:center; gap:12px; margin-bottom:8px}
+.effbar{flex:1; height:30px; border-radius:var(--r-pill); background:var(--surface-sunk);
+  border:1px solid var(--line); overflow:hidden; position:relative}
+.effbar > i{display:block; height:100%; border-radius:var(--r-pill); background:var(--neutral-300);
+  transition:width .5s cubic-bezier(.4,0,.2,1)}
+.effbar > i.win{background:var(--accent)}
+.effbar .zero{position:absolute; top:0; bottom:0; width:2px; background:var(--line-strong)}
+.net{font-family:var(--font-mono); font-weight:800; font-size:1.15rem; min-width:74px; text-align:right}
+.net small{font-family:var(--font-body); font-weight:600; font-size:.62rem; color:var(--ink-soft);
+  display:block; line-height:1; letter-spacing:.02em; text-transform:uppercase}
+.candidate.chosen .net{color:var(--accent)}
+
+.design-box{margin:0 0 14px; padding:11px 14px; border-radius:var(--r-md);
+  background:var(--surface-sunk); border:1px solid var(--line); border-left:4px solid var(--line-strong)}
+.design-box.empty{color:var(--ink-soft); font-style:italic; font-size:.9rem; line-height:1.35}
+.db-head{font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; font-weight:800;
+  color:var(--ink-soft); margin-bottom:7px}
+.db-item{font-size:.88rem; line-height:1.32; display:flex; gap:8px; align-items:baseline; margin-bottom:5px; color:var(--ink-soft)}
+.db-item:last-child{margin-bottom:0}
+.db-item .ar{font-family:var(--font-mono); font-weight:800; flex:0 0 auto; width:1.1em; text-align:center}
+.db-item b{color:var(--ink); font-weight:700}
+.db-item.easier .ar{color:var(--success)}
+.db-item.harder .ar{color:var(--danger)}
+.db-item.flat .ar{color:var(--warning)}
+.db-tag{font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em;
+  padding:2px 7px; border-radius:var(--r-pill); margin-left:2px; white-space:nowrap}
+.db-tag.neutral{background:var(--neutral-100); color:var(--ink-soft)}
+[data-theme="dark"] .db-tag.neutral{background:var(--line)}
+
+.breakdown{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+.term{font-family:var(--font-mono); font-size:.82rem; padding:3px 9px; border-radius:var(--r-pill);
+  background:var(--surface-sunk); border:1px solid var(--line); white-space:nowrap; display:inline-flex; gap:5px; align-items:baseline}
+.term b{font-weight:800}
+.term small{font-family:var(--font-body); font-size:.72rem; color:var(--ink-soft)}
+.term.easier{color:var(--success); border-color:color-mix(in srgb,var(--success) 45%,var(--line))}
+.term.harder{color:var(--danger);  border-color:color-mix(in srgb,var(--danger) 45%,var(--line))}
+.term.eq{background:var(--ink); color:var(--surface); border-color:var(--ink); font-weight:800}
+.term.eq small{color:var(--surface); opacity:.8}
+.pickpill{font-family:var(--font-mono); font-size:.76rem; color:var(--ink-soft); margin-left:auto; white-space:nowrap}
+
+.sim-legend{display:flex; gap:18px; flex-wrap:wrap; justify-content:center; align-items:center;
+  max-width:900px; margin:0 auto var(--sp-3); padding:10px 16px; border-radius:var(--r-pill);
+  background:var(--surface); border:1.5px solid var(--line); font-size:.86rem}
+.sim-legend b{font-weight:700}
+.sim-legend .key{display:inline-flex; align-items:center; gap:7px}
+.sim-legend .swatch{width:26px; height:12px; border-radius:var(--r-pill); display:inline-block}
+.sim-legend .swatch.win{background:var(--accent)}
+.sim-legend .swatch.easier{background:var(--success)}
+.sim-legend .swatch.harder{background:var(--danger)}
+
+.meters{display:flex; gap:14px; margin-top:6px}
+.meter{flex:1}
+.meter .ml{display:flex; justify-content:space-between; font-size:.78rem; font-weight:700; margin-bottom:4px}
+.meter .ml .val{font-family:var(--font-mono)}
+.meter .track{height:16px; border-radius:var(--r-pill); background:var(--surface-sunk); border:1px solid var(--line); overflow:hidden}
+.meter .fill{height:100%; width:0; transition:width .5s cubic-bezier(.4,0,.2,1); border-radius:var(--r-pill)}
+.meter.build .fill{background:var(--series-build)} .meter.build .ml{color:var(--series-build)}
+.meter.break .fill{background:var(--series-break)} .meter.break .ml{color:var(--series-break)}
+
+.transport{display:flex; align-items:center; gap:12px; justify-content:center; margin:var(--sp-3) 0 var(--sp-2); flex-wrap:wrap}
+.transport .dayflag{font-family:var(--font-display);font-weight:800;font-size:1.1rem;min-width:150px;text-align:center}
+.icon-btn{width:46px;height:46px;border-radius:var(--r-pill);border:1.5px solid var(--line-strong);background:var(--surface);
+  cursor:pointer;display:grid;place-items:center;font-size:1.1rem;transition:background .14s}
+.icon-btn:hover{background:var(--surface-sunk)}
+.progress-line{height:6px;border-radius:var(--r-pill);background:var(--surface-sunk);overflow:hidden;margin:0 auto var(--sp-2);max-width:900px}
+.progress-line > i{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+
+.result-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-3)}
+.result-grid.solo{grid-template-columns:1fr; max-width:640px; margin:0 auto}
+@media(max-width:820px){.result-grid{grid-template-columns:1fr}}
+.scorecard{background:var(--surface); border:2px solid var(--line); border-radius:var(--r-lg); padding:var(--sp-4); position:relative}
+.scorecard.winner{border-color:var(--accent); box-shadow:var(--shadow)}
+.crown{position:absolute; top:-14px; right:20px; background:var(--accent); color:#fff; font-weight:800;
+  font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; padding:6px 14px; border-radius:var(--r-pill)}
+.grade{font-family:var(--font-display); font-weight:800; font-size:clamp(52px,8vw,90px); line-height:1}
+.scorecard .team-name{font-size:1.4rem}
+.score-num{font-family:var(--font-mono); font-weight:800; font-size:1.6rem}
+.stat-rows{margin:var(--sp-2) 0}
+.stat-rows .row{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--line); font-size:.95rem}
+.stat-rows .row .mono{font-weight:700}
+.debrief{margin-top:var(--sp-2)}
+.debrief h4{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px}
+.debrief .d-item{padding:9px 12px;border-radius:var(--r-sm);margin-bottom:7px;border-left:4px solid var(--line-strong);
+  background:var(--surface-sunk);font-size:.88rem}
+.debrief .d-item.pseudo{border-left-color:var(--warning);background:var(--warning-soft)}
+.debrief .d-item .pr{font-weight:700}
+.debrief .d-item small{display:block;color:var(--ink-soft);margin-top:2px}
+.callout{margin-top:var(--sp-2); padding:14px 16px; border-radius:var(--r-md); background:var(--surface-sunk);
+  border:1.5px dashed var(--line-strong); font-size:.92rem}
+.callout b{color:var(--accent)}
+
+.footnote{color:var(--ink-soft);font-size:.8rem;margin-top:var(--sp-3);max-width:70ch}
+.hidden{display:none !important}
+.center{text-align:center}
+.mt3{margin-top:var(--sp-3)} .mt4{margin-top:var(--sp-4)}
+.row-actions{display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:var(--sp-3)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important}
+}
+.event-line{max-width:900px; margin:0 auto var(--sp-2); padding:10px 16px; border-radius:var(--r-md);
+  background:var(--warning-soft); color:var(--ink); text-align:center; font-weight:600}
+.name-input{font:inherit; color:inherit; background:transparent; border:none; border-bottom:1.5px dashed var(--line-strong);
+  width:10ch; padding:0}
+.preds{margin-top:var(--sp-2); padding-top:var(--sp-2); border-top:1.5px solid var(--line)}
+.preds .glabel{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--ink-soft);margin-bottom:6px}
+.preds label{display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:.92rem; margin-bottom:6px}
+.preds input{width:4.5em; font:inherit; padding:4px 6px; border:1.5px solid var(--line-strong); border-radius:var(--r-sm);
+  background:var(--surface); color:var(--ink); text-align:center}
+.slider-read{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; font-weight:700; margin:8px 0}
+input[type=range]{width:100%; accent-color:var(--accent)}
+.questions{margin:0; padding-left:1.3em}
+.questions li{margin-bottom:10px; max-width:75ch}
+.scorecard .grade{color:var(--accent)}
+@media(max-width:560px){.week{grid-template-columns:repeat(2,1fr)} .app{padding-left:16px;padding-right:16px} .topbar,.brand{flex-wrap:wrap}}
 </style>
 </head>
 <body>
-<div class="page">
-  <header class="top">
-    <span class="name">Friction Wars</span>
-    <span class="step" id="stepLabel"></span>
-  </header>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <span class="mark">Friction<em>Wars</em></span>
+      <span class="tag">Stress and recovery</span>
+    </div>
+    <span class="spacer"></span>
+    <button class="ghost-btn" id="themeToggle" aria-label="Switch colour theme"><span id="themeLabel">Dark mode</span></button>
+  </div>
 
-  <!-- 1. Set up -->
-  <section id="s-setup">
-    <h1>Friction Wars</h1>
-    <p class="lead" style="margin-top:.6rem">A 30-minute exercise for the HRV debrief. It shows why people do whatever takes least effort at the moment of choice, and how to set up a working week so that recovery is the easy option.</p>
-    <div class="setup" style="margin-top:1.4rem">
+  <nav class="rail" aria-label="Progress">
+    <div class="step" data-step="start"><span class="n">01</span> Set up</div>
+    <div class="step" data-step="brief"><span class="n">02</span> Brief</div>
+    <div class="step" data-step="design"><span class="n">03</span> Design</div>
+    <div class="step" data-step="sim"><span class="n">04</span> Simulate</div>
+    <div class="step" data-step="result"><span class="n">05</span> Compare</div>
+  </nav>
+
+  <!-- START -->
+  <section id="screen-start" class="screen">
+    <div class="slab hero">
       <div>
-        <fieldset>
-          <legend>Number of tables</legend>
-          <div class="counts" id="countList"></div>
-        </fieldset>
-        <fieldset>
-          <legend>Table names</legend>
-          <div class="names" id="nameList"></div>
-        </fieldset>
+        <div class="eyebrow">HRV debrief exercise</div>
+        <h1 class="display-xl">Make recovery<br>the easy<br>option.</h1>
+        <p class="lede">At every decision point, people do whatever takes less effort at that moment. In this exercise
+          you change Sam's environment so that the recovery options take less effort than the stressful ones, then
+          watch what Sam does over a fortnight.</p>
       </div>
-      <div class="notes small">
-        <b>Facilitator notes</b>
-        <ol>
-          <li><b>The rule, 5 minutes.</b> Show the two choices and ask the room to predict the fortnight with nothing changed.</li>
-          <li><b>Design, 10 minutes.</b> Each table gets the eight printed cards and 10 points. They choose cards and write down two predictions. Enter both here.</li>
-          <li><b>The fortnight, 5 minutes.</b> Play the 14 days. Pause on the days marked with a note.</li>
-          <li><b>Debrief, 10 minutes.</b> Show what each card did, then use the slider to show how little separates no change from complete change. Finish with the questions, with each person's HRV report in front of them.</li>
-        </ol>
-        <p style="margin-top:.8rem">Print the cards and prediction sheets before the session. The card backs are not printed; their effects are shown in the debrief.</p>
-        <button class="btn plain" id="printBtn">Print cards and sheets</button>
+      <div>
+        <div class="slab" style="background:var(--surface-sunk)">
+          <h3 style="margin-bottom:10px">How will the room play?</h3>
+          <div class="mode-set" role="radiogroup" aria-label="Play mode">
+            <div class="opt sel" data-mode="competitive" role="radio" aria-checked="true" tabindex="0">
+              <span class="dot"></span>
+              <div><b>Two teams</b><p>Each team designs Sam's environment with the same budget. The team whose Sam recovers more often wins.</p></div>
+            </div>
+            <div class="opt" data-mode="collaborative" role="radio" aria-checked="false" tabindex="0">
+              <span class="dot"></span>
+              <div><b>One design for the whole room</b><p>The room agrees on a single design together.</p></div>
+            </div>
+          </div>
+          <button class="btn big" id="toBrief" style="width:100%;margin-top:8px">Read the brief</button>
+        </div>
       </div>
     </div>
-    <div class="actions"><div class="right"><button class="btn" id="toRule">Start</button></div></div>
+    <p class="footnote">The effort values, card costs and events are set for teaching. They are not measurements, and the
+      exercise does not use anyone's HRV data.</p>
   </section>
 
-  <!-- 2. The rule -->
-  <section id="s-rule" class="hidden">
-    <h1 id="ruleTitle"></h1>
-    <p class="lead" id="ruleIntro" style="margin-top:.6rem"></p>
-    <div id="ruleChoices" style="margin-top:1.2rem"></div>
-    <div class="choicepoint">
-      <p style="font-weight:700; margin-bottom:.4rem" id="ruleQuestion"></p>
-      <button class="btn plain" id="ruleRun">Show the fortnight</button>
-      <div id="ruleResult" class="hidden" style="margin-top:1rem"></div>
-    </div>
-    <div class="actions">
-      <button class="btn plain" data-go="setup">Back</button>
-      <div class="right"><button class="btn" id="toDesign">Next: design</button></div>
+  <!-- BRIEF -->
+  <section id="screen-brief" class="screen hidden">
+    <div class="slab">
+      <div class="hero" style="align-items:start">
+        <div>
+          <div class="eyebrow" id="briefEyebrow">Brief</div>
+          <h1 style="font-size:clamp(30px,4vw,48px);margin:6px 0 10px" id="briefTitle"></h1>
+          <p class="lede" id="briefBlurb"></p>
+          <div class="targets">
+            <div class="target build">
+              <div class="k">Habit to build</div>
+              <div class="v" id="briefBuild"></div>
+              <div class="sub" id="briefBuildSub"></div>
+            </div>
+            <div class="target break">
+              <div class="k">Habit to break</div>
+              <div class="v" id="briefBreak"></div>
+              <div class="sub" id="briefBreakSub"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="slab" style="background:var(--surface-sunk);padding:var(--sp-3)">
+            <div class="k" style="font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--ink-soft)">Budget</div>
+            <div style="font-family:var(--font-display);font-weight:800;font-size:2.6rem;color:var(--accent)" id="briefBudget"></div>
+            <p style="color:var(--ink-soft);font-size:.9rem;margin:0">per team, to spend on changes to Sam's environment.
+              Some changes alter the effort at the moment Sam chooses. Others do not.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="mt4" style="margin-bottom:6px">Sam's fortnight: two decisions a day</h3>
+      <div class="week" id="briefWeek"></div>
+
+      <div class="slab callout mt4">Each team gets the <b>same</b> budget and the <b>same</b> list of cards, shown when
+        you start designing. The cards are not labelled. Your task is to decide which of them change the effort at
+        13:00 and 22:30.</div>
+
+      <div class="row-actions">
+        <button class="btn secondary" data-goto="start">Back</button>
+        <button class="btn big" id="toDesign">Start designing</button>
+      </div>
     </div>
   </section>
 
-  <!-- 3. Design -->
-  <section id="s-design" class="hidden">
-    <h1>Spend 10 points on the environment</h1>
-    <p class="lead" style="margin-top:.6rem" id="designIntro"></p>
-    <table class="matrix" id="matrix"></table>
-    <p class="small muted" style="margin-top:.6rem">A card that cannot be afforded is greyed out. Predictions are optional.</p>
-    <div class="actions">
-      <button class="btn plain" data-go="rule">Back</button>
-      <div class="right"><button class="btn" id="toReveal">Run the fortnight</button></div>
+  <!-- DESIGN -->
+  <section id="screen-design" class="screen hidden">
+    <div class="center" style="margin-bottom:var(--sp-3)">
+      <div class="eyebrow">Design</div>
+      <h1 style="font-size:clamp(26px,3.6vw,40px)">Spend the budget on Sam's environment</h1>
+      <p class="lede" style="margin:6px auto 0">The facilitator enters each team's choices. Cards you cannot afford are
+        greyed out. Before running, write down how often you expect Sam to recover.</p>
+    </div>
+    <div id="designNote"></div>
+    <div class="arena" id="designArena"></div>
+    <div class="row-actions" style="justify-content:center">
+      <button class="btn secondary" data-goto="brief">Back to brief</button>
+      <button class="btn big" id="toSim">Run the fortnight</button>
     </div>
   </section>
 
-  <!-- 4. The fortnight -->
-  <section id="s-reveal" class="hidden">
-    <div class="dayhead">
-      <h2 id="dayTitle"></h2>
-      <div class="controls">
-        <button class="btn plain" id="prevDay" aria-label="Previous day">Previous</button>
-        <button class="btn" id="playBtn">Play</button>
-        <button class="btn plain" id="nextDay" aria-label="Next day">Next day</button>
-        <button class="btn plain" id="allDays">Show all 14 days</button>
-      </div>
+  <!-- SIMULATION -->
+  <section id="screen-sim" class="screen hidden">
+    <div class="center" style="margin-bottom:var(--sp-2)">
+      <div class="eyebrow">Simulation</div>
+      <h1 style="font-size:clamp(24px,3.2vw,36px)">Sam takes the shorter bar, every time</h1>
     </div>
-    <div class="events" id="events" aria-live="polite"></div>
-    <div class="teams" id="teams"></div>
-    <p class="small muted" style="margin-top:.8rem" id="gapKey"></p>
-    <div class="actions">
-      <button class="btn plain" data-go="design">Back to design</button>
-      <div class="right"><button class="btn" id="toDebrief">Next: debrief</button></div>
+    <div class="progress-line"><i id="simProgress"></i></div>
+    <div class="transport">
+      <button class="icon-btn" id="simPrev" aria-label="Previous decision">&lsaquo;</button>
+      <button class="btn secondary" id="simPlay">Pause</button>
+      <div class="dayflag" id="simDayFlag">Day 1</div>
+      <button class="icon-btn" id="simNext" aria-label="Next decision">&rsaquo;</button>
+      <button class="btn secondary" id="simSkip">Skip to results</button>
     </div>
+    <div class="event-line" id="simEvent" aria-live="polite"></div>
+    <div class="sim-legend">
+      <span class="key"><span class="swatch win"></span> The shorter bar wins</span>
+      <span class="key"><span class="swatch easier"></span> lowers effort</span>
+      <span class="key"><span class="swatch harder"></span> raises effort</span>
+    </div>
+    <div class="sim-grid" id="simGrid" aria-live="polite"></div>
+    <p class="footnote center" style="margin-left:auto;margin-right:auto">Each bar is the effort an option takes at that
+      moment: its <b>starting effort</b>, changed by <b>your cards</b>, the <b>habit</b> built up so far, the <b>time of
+      day</b> and anything happening <b>today</b>. Sam does whichever takes less.</p>
   </section>
 
-  <!-- 5. Debrief -->
-  <section id="s-debrief" class="hidden">
-    <h1>What happened</h1>
-
-    <section class="block">
-      <h2>What each card did</h2>
-      <table class="cards" id="cardTable"></table>
-    </section>
-
-    <section class="block">
-      <h2 id="sliderTitle"></h2>
-      <p class="lead" id="sliderIntro"></p>
-      <div class="slider-wrap">
-        <label for="slider" class="small muted" id="sliderLabel"></label>
-        <input type="range" id="slider" min="0" max="6" step="0.25" value="0">
-        <div class="slider-read"><span id="sliderX"></span><span id="sliderY"></span></div>
-        <div id="sliderCal"></div>
-        <div id="sliderChart" class="gap"></div>
-      </div>
-      <p style="margin-top:.8rem" id="sliderFinding"></p>
-    </section>
-
-    <section class="block questions">
-      <h2>Questions for the room</h2>
-      <ol id="questions"></ol>
-    </section>
-
-    <section class="block">
-      <details>
-        <summary>How the model works</summary>
-        <p style="margin-top:.6rem">At each choice, the effort of an option is its starting effort, plus or minus the cards that act on it, minus the strength of the habit, minus the pull of the time of day, plus any event on that day. The person takes the option with the lower effort. There is no randomness, so every table faces the same fortnight and every difference between tables comes from the cards.</p>
-        <p>Each time an option is chosen its habit grows, faster if it is rewarding. When it is not chosen, its habit fades a little. A second card on the same option counts for 72% of its face value and a third for 52%.</p>
-        <p>The numbers are set for teaching. They are not measurements, and the model does not use anyone's HRV data.</p>
-      </details>
-    </section>
-
-    <div class="actions">
-      <button class="btn plain" data-go="reveal">Back</button>
-      <div class="right">
-        <button class="btn plain" id="redesign">Change the designs and run again</button>
-        <button class="btn" id="restart">New session</button>
-      </div>
+  <!-- RESULT -->
+  <section id="screen-result" class="screen hidden">
+    <div class="center" style="margin-bottom:var(--sp-3)">
+      <div class="eyebrow">Results and debrief</div>
+      <h1 style="font-size:clamp(26px,3.6vw,42px)">How often did Sam recover?</h1>
     </div>
+    <div class="result-grid" id="resultGrid" aria-live="polite"></div>
+    <div class="slab callout mt4" id="compareCallout"></div>
+
+    <div class="slab mt4">
+      <h3 style="margin-bottom:6px">How much change does it take?</h3>
+      <p style="color:var(--ink-soft);margin:0 0 12px" id="sliderIntro"></p>
+      <label for="slider" class="sr-only">Effort points removed from the walk</label>
+      <input type="range" id="slider" min="0" max="6" step="0.25" value="0">
+      <div class="slider-read"><span id="sliderX"></span><span id="sliderY"></span></div>
+      <div id="sliderChart"></div>
+      <p style="margin:10px 0 0" id="sliderFinding"></p>
+    </div>
+
+    <div class="slab mt4">
+      <h3 style="margin-bottom:10px">Questions for the room</h3>
+      <ol class="questions" id="questions"></ol>
+    </div>
+
+    <div class="row-actions" style="justify-content:center">
+      <button class="btn secondary" id="redesignBtn">Change the designs and run again</button>
+      <button class="btn" id="newGameBtn">New game</button>
+    </div>
+    <p class="footnote center" style="margin-left:auto;margin-right:auto">There is no chance in the model: every team
+      faces the same fortnight, so every difference between teams comes from their cards. Habit strength rises each
+      time an option is chosen, faster when it is rewarding, and fades a little when it is not. A second card on the
+      same option counts for 72% of its value, a third for 52%. To list every possible design and its result, open the
+      browser console and run <span class="mono">FrictionWars.check()</span>.</p>
   </section>
 </div>
-
-<div id="print"></div>
 
 <script>
 "use strict";
 
-/* Model settings. Calibrate with FrictionWars.check() in the console. */
-const MODEL = { kHabit:6, learn:0.35, decay:0.92, stack:0.72, days:14, budget:10 };
-const DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const COLOURS = ['var(--g1)','var(--g2)','var(--g3)','var(--g4)'];
+/* Model settings. These are teaching values, not measurements. */
+const MODEL = { kHabit:6, learn:0.35, decay:0.92, stack:0.72, days:14, budget:10, autoStepMs:1650 };
+const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
-const ACTIONS = {
-  amGood:{ base:6,   reward:0.45, init:0.05, drive:1.5 },
-  amBad: { base:2,   reward:0.10, init:0.25, drive:0.5 },
-  pmBad: { base:2.5, reward:0.40, init:0.50, drive:1.5 },
-  pmGood:{ base:3,   reward:0.60, init:0.10, drive:0   },
-};
-const CARD_FX = {
-  c1:{ cost:2, fx:[['amGood',-3]] },
-  c2:{ cost:2, fx:[['amGood',-2.5]] },
-  c3:{ cost:1, fx:[['amGood',-1.5]] },
-  c4:{ cost:3, fx:[['amGood',-2],['amBad',2]] },
-  c5:{ cost:3, fx:[['pmBad',3.5]] },
-  c6:{ cost:2, fx:[['pmBad',2.5]] },
-  c7:{ cost:2, fx:[], reward:['amGood',2] },
-  c8:{ cost:1, fx:[] },
-};
-const EVENT_FX = [
-  { day:2,  slot:'am', action:'amGood', mod:1.5,  key:'offsiteAm' },
-  { day:3,  slot:'am', action:'amGood', mod:1.5,  key:'offsiteAm' },
-  { day:2,  slot:'pm', action:'pmBad',  mod:-1.5, key:'offsitePm' },
-  { day:3,  slot:'pm', action:'pmBad',  mod:-1.5, key:'offsitePm' },
-  { day:4,  slot:'pm', action:'pmBad',  mod:3,    key:'quietPm' },
-  { day:5,  slot:'pm', action:'pmBad',  mod:3,    key:'quietPm' },
-  { day:5,  slot:'am', action:'amGood', mod:-1.5, key:'weekendAm' },
-  { day:6,  slot:'am', action:'amGood', mod:-1.5, key:'weekendAm' },
-  { day:8,  slot:'am', action:'amGood', mod:2,    key:'crisisAm' },
-  { day:9,  slot:'pm', action:'pmBad',  mod:-1.5, key:'resultsPm' },
-  { day:11, slot:'pm', action:'pmBad',  mod:3,    key:'quietPm' },
-  { day:12, slot:'pm', action:'pmBad',  mod:3,    key:'quietPm' },
-  { day:12, slot:'am', action:'amGood', mod:-1.5, key:'weekendAm' },
-  { day:13, slot:'am', action:'amGood', mod:-1.5, key:'weekendAm' },
-];
-
-const SCENARIOS = {
-  sam:{
-    id:'sam', title:'Sam\'s recovery fortnight',
-    person:'Sam',
-    intro:'Sam runs a division. Sam\'s HRV report showed almost no recovery between 08:00 and 19:00, and recovery starting late at night. Sam wants two changes: a 15-minute walk outside at lunchtime, and no email in bed. At 13:00 Sam chooses between the walk and staying at the desk. At 22:30 Sam chooses between email and putting the phone down. Each time, Sam takes the option that needs less effort at that moment.',
-    am:{ time:'13:00', good:'Walk outside for 15 minutes', bad:'Eat at the desk and keep working',
-         goodPhrase:'walking outside', badPhrase:'staying at the desk', row:'Break outside', unit:'days' },
-    pm:{ time:'22:30', good:'Put the phone down, read, then sleep', bad:'Check email in bed',
-         goodPhrase:'putting the phone down', badPhrase:'checking email in bed', row:'No email in bed', unit:'nights' },
-    question:'If nothing around Sam changes, on how many of the next 14 days will Sam take the walk?',
-    after:(am,pm)=>`A break outside on ${am} of 14 days. Email in bed on ${14-pm} of 14 nights. Sam wants both changes, and wanting them does not shorten either bar.`,
-    designIntro:'Each table chooses cards for Sam\'s environment. Cards cost 1 to 3 points. Before running, each table writes down how many days Sam will take the walk and how many nights Sam will stay off email.',
-    events:{
-      offsiteAm:'Leadership offsite. Sessions run straight through lunch.',
-      offsitePm:'The offsite dinner ends late and the discussion carries on over email.',
-      quietPm:'A quiet evening. Very little new email.',
-      weekendAm:'Weekend. No meetings at lunchtime.',
-      crisisAm:'A problem in one region. Back-to-back calls over lunch.',
-      resultsPm:'Quarterly results day. The pull to check email tonight is stronger.',
-    },
-    cards:{
-      c1:{ name:'Block 13:00 to 13:15 in your diary so no meetings land there', kind:'Makes the walk easier', back:'Walking takes 3 points less effort. There is no meeting to move first.' },
-      c2:{ name:'Keep a coat and walking shoes at the office', kind:'Makes the walk easier', back:'Walking takes 2.5 points less effort.' },
-      c3:{ name:'Pick one 15-minute route from the office door', kind:'Makes the walk easier', back:'Walking takes 1.5 points less effort. There is nothing to decide.' },
-      c4:{ name:'Agree to walk with a colleague who calls for you at 13:00', kind:'Easier walk and a harder desk lunch', back:'Walking takes 2 points less effort and staying at the desk takes 2 points more. Someone is waiting.' },
-      c5:{ name:'Remove work email from your personal phone', kind:'Makes email in bed harder', back:'Email in bed takes 3.5 points more effort. It needs the laptop.' },
-      c6:{ name:'Charge the phone outside the bedroom', kind:'Makes email in bed harder', back:'Email in bed takes 2.5 points more effort.' },
-      c7:{ name:'End the walk at the best coffee nearby', kind:'Rewards the walk afterwards', back:'Each walk builds the habit twice as fast. It does nothing until Sam takes the first one.' },
-      c8:{ name:'Make "more recovery" a personal objective for the quarter', kind:'No change at the moment of choice', back:'At 13:00 and 22:30 both options take exactly the same effort as before.' },
-    },
-    questions:[
-      'Find the part of the day in your HRV report with the least recovery. What are you usually doing then, and which option takes less effort at that moment?',
-      'Think about recovery plans you have made before. Which of them changed the steps involved, and which changed only your intentions?',
-      'The offsite made Sam\'s evening email worse. Which weeks in your diary will do the same, and what could you set up before they start?',
-      'On quiet evenings, Sam stopped checking email only where a card had already made it harder. When are your quiet evenings, and is your environment ready for them?',
-      'On the slider, a fraction of a point separated no change from a complete change. Which recovery habit might be just short of that point for you?',
-    ],
+const SCENARIO = {
+  name:"Sam's recovery fortnight",
+  person:'Sam',
+  blurb:"Sam runs a division. Sam's HRV report showed almost no recovery between 08:00 and 19:00, and recovery starting late at night. Sam wants to take a 15-minute walk outside at lunchtime and to stop reading email in bed.",
+  build:'walk', break:'email',
+  buildLabel:'A lunchtime walk outside', buildSub:'Not a habit yet. Leaving the desk takes effort and the benefit is not felt straight away.',
+  breakLabel:'Email in bed', breakSub:'Well established. One more look is always easy.',
+  actions:{
+    walk:  {label:'Walk outside for 15 minutes',          base:6,   reward:0.45, init:0.05, tag:'build', drive:1.5},
+    desk:  {label:'Eat at the desk and keep working',     base:2,   reward:0.10, init:0.25, tag:null,    drive:0.5},
+    email: {label:'Check email in bed',                   base:2.5, reward:0.40, init:0.50, tag:'break', drive:1.5},
+    read:  {label:'Put the phone down, read, then sleep', base:3,   reward:0.60, init:0.10, tag:null,    drive:0},
   },
+  slots:[
+    {key:'lunch',   time:'13:00', cue:'Lunchtime, at the desk',     candidates:['walk','desk']},
+    {key:'evening', time:'22:30', cue:'In bed, phone on the table', candidates:['email','read']},
+  ],
+  events:[
+    {day:2,  slot:'lunch',   action:'walk',  mod:1.5,  short:'Offsite',      text:'Leadership offsite. Sessions run straight through lunch.'},
+    {day:3,  slot:'lunch',   action:'walk',  mod:1.5,  short:'Offsite',      text:'Leadership offsite. Sessions run straight through lunch.'},
+    {day:2,  slot:'evening', action:'email', mod:-1.5, short:'Late dinner',  text:'The offsite dinner ends late and the discussion carries on over email.'},
+    {day:3,  slot:'evening', action:'email', mod:-1.5, short:'Late dinner',  text:'The offsite dinner ends late and the discussion carries on over email.'},
+    {day:4,  slot:'evening', action:'email', mod:3,    short:'Quiet evening',text:'A quiet evening. Very little new email.'},
+    {day:5,  slot:'evening', action:'email', mod:3,    short:'Quiet evening',text:'A quiet evening. Very little new email.'},
+    {day:5,  slot:'lunch',   action:'walk',  mod:-1.5, short:'Weekend',      text:'Weekend. No meetings at lunchtime.'},
+    {day:6,  slot:'lunch',   action:'walk',  mod:-1.5, short:'Weekend',      text:'Weekend. No meetings at lunchtime.'},
+    {day:8,  slot:'lunch',   action:'walk',  mod:2,    short:'Regional problem', text:'A problem in one region. Back-to-back calls over lunch.'},
+    {day:9,  slot:'evening', action:'email', mod:-1.5, short:'Results day',  text:'Quarterly results day. The pull to check email tonight is stronger.'},
+    {day:11, slot:'evening', action:'email', mod:3,    short:'Quiet evening',text:'A quiet evening. Very little new email.'},
+    {day:12, slot:'evening', action:'email', mod:3,    short:'Quiet evening',text:'A quiet evening. Very little new email.'},
+    {day:12, slot:'lunch',   action:'walk',  mod:-1.5, short:'Weekend',      text:'Weekend. No meetings at lunchtime.'},
+    {day:13, slot:'lunch',   action:'walk',  mod:-1.5, short:'Weekend',      text:'Weekend. No meetings at lunchtime.'},
+  ],
+  // listed in mixed order on purpose; the design screen shows no types or numbers
+  interventions:[
+    {id:'block',  label:'Block 13:00 to 13:15 in your diary so no meetings land there', cost:2, target:'walk', mod:-3.0, note:'Walking takes 3 points less effort. There is no meeting to move first.'},
+    {id:'nophone',label:'Remove work email from your personal phone', cost:3, target:'email', mod:3.5, note:'Email in bed takes 3.5 points more effort. It needs the laptop.'},
+    {id:'goal',   label:'Make "more recovery" a personal objective for the quarter', cost:1, target:'walk', mod:0, pseudo:true, note:'Changes nothing at 13:00 or 22:30. Both options take the same effort as before.'},
+    {id:'route',  label:'Pick one 15-minute route from the office door', cost:1, target:'walk', mod:-1.5, note:'Walking takes 1.5 points less effort. There is nothing to decide.'},
+    {id:'charge', label:'Charge the phone outside the bedroom', cost:2, target:'email', mod:2.5, note:'Email in bed takes 2.5 points more effort.'},
+    {id:'coffee', label:'End the walk at the best coffee nearby', cost:2, target:'walk', mod:0, reward:2, note:'Each walk builds the habit twice as fast. It does nothing until Sam takes the first walk.'},
+    {id:'buddy',  label:'Agree to walk with a colleague who calls for you at 13:00', cost:3, target:'walk', mod:-2.0, mod2Target:'desk', mod2:2.0, note:'Walking takes 2 points less effort and staying at the desk takes 2 more. Someone is waiting.'},
+    {id:'coat',   label:'Keep a coat and walking shoes at the office', cost:2, target:'walk', mod:-2.5, note:'Walking takes 2.5 points less effort.'},
+  ],
+  questions:[
+    'Find the part of the day in your HRV report with the least recovery. What are you usually doing then, and which option takes less effort at that moment?',
+    'Think about recovery plans you have made before. Which of them changed the steps involved, and which changed only your intentions?',
+    'The offsite made Sam\'s evening email worse. Which weeks in your diary will do the same, and what could you set up before they start?',
+    'On quiet evenings, Sam stopped checking email only where a card had already made it harder. When are your quiet evenings, and is your environment ready for them?',
+    'On the slider, a fraction of a point separated no change from a complete change. Which recovery habit might be just short of that point for you?',
+  ],
 };
-const CARD_IDS = Object.keys(CARD_FX);
+const sc = () => SCENARIO;
 
 /* ---------- engine ---------- */
-function combine(mods){
-  return mods.slice().sort((a,b)=>Math.abs(b)-Math.abs(a))
-    .reduce((t,m,i)=>t+m*Math.pow(MODEL.stack,i),0);
-}
-function simulate(picks, extra){
-  const lists={};
-  const add=(a,m)=>{ (lists[a]=lists[a]||[]).push(m); };
-  const reward={};
-  for(const a in ACTIONS) reward[a]=ACTIONS[a].reward;
-  picks.forEach(id=>{
-    const c=CARD_FX[id];
-    c.fx.forEach(([a,m])=>add(a,m));
-    if(c.reward) reward[c.reward[0]]*=c.reward[1];
-  });
-  (extra||[]).forEach(([a,m])=>add(a,m));
-  const card={};
-  for(const a in lists) card[a]=combine(lists[a]);
-
-  const habit={};
-  for(const a in ACTIONS) habit[a]=ACTIONS[a].init;
-  const out={am:[],pm:[]};
-  for(let d=0; d<MODEL.days; d++){
-    for(const slot of ['am','pm']){
-      const good=slot+'Good', bad=slot+'Bad';
-      const eff={};
-      for(const a of [good,bad]){
-        const A=ACTIONS[a];
-        const ev=EVENT_FX.filter(e=>e.day===d && e.slot===slot && e.action===a).reduce((t,e)=>t+e.mod,0);
-        eff[a]=A.base+(card[a]||0)-MODEL.kHabit*habit[a]-A.drive+ev;
-      }
-      const didGood = eff[good] < eff[bad];
-      const chosen = didGood?good:bad, other = didGood?bad:good;
-      habit[chosen] += MODEL.learn*reward[chosen]*(1-habit[chosen]);
-      habit[other]  *= MODEL.decay;
-      out[slot].push({ good:didGood, gap:eff[good]-eff[bad], effGood:eff[good], effBad:eff[bad] });
-    }
-  }
-  out.amCount=out.am.filter(x=>x.good).length;
-  out.pmCount=out.pm.filter(x=>x.good).length;
+function buildFortnight(s){
+  const out=[];
+  for(let d=0; d<MODEL.days; d++) for(const sl of s.slots) out.push({day:d, slot:sl.key, time:sl.time, cue:sl.cue, candidates:sl.candidates});
   return out;
 }
+function combine(mods){
+  return mods.slice().sort((a,b)=>Math.abs(b)-Math.abs(a)).reduce((t,m,i)=>t+m*Math.pow(MODEL.stack,i),0);
+}
+function frictionMap(s, picks, extra){
+  const lists={};
+  const add=(a,m)=>{ if(m) (lists[a]=lists[a]||[]).push(m); };
+  picks.forEach(id=>{ const iv=s.interventions.find(x=>x.id===id); if(!iv) return;
+    add(iv.target, iv.mod); if(iv.mod2Target) add(iv.mod2Target, iv.mod2); });
+  (extra||[]).forEach(([a,m])=>add(a,m));
+  const map={}; for(const k in lists) map[k]=combine(lists[k]);
+  return map;
+}
+function simulate(s, picks, extra){
+  const fmap=frictionMap(s, picks, extra);
+  const reward={}, habit={};
+  for(const id in s.actions){ reward[id]=s.actions[id].reward; habit[id]=s.actions[id].init; }
+  picks.forEach(id=>{ const iv=s.interventions.find(x=>x.id===id); if(iv && iv.reward) reward[iv.target]*=iv.reward; });
+  const trace=[];
+  buildFortnight(s).forEach((dp,i)=>{
+    const rows=dp.candidates.map(cid=>{
+      const A=s.actions[cid];
+      const friction=fmap[cid]||0;
+      const habitBonus=MODEL.kHabit*habit[cid];
+      const evs=s.events.filter(e=>e.day===dp.day && e.slot===dp.slot && e.action===cid);
+      const event=evs.reduce((t,e)=>t+e.mod,0);
+      const eff=A.base+friction-habitBonus-A.drive+event;
+      return {id:cid, label:A.label, tag:A.tag, base:A.base, friction, habitBonus, drive:A.drive, event, eff};
+    });
+    // the lower effort wins; on a tie the old habit wins
+    const [a,b]=rows;
+    const pick = a.eff<b.eff ? a : (b.eff<a.eff ? b : rows.find(r=>r.tag!=='build' && r.tag!==null) || b);
+    for(const r of rows){
+      if(r.id===pick.id) habit[r.id]+=MODEL.learn*reward[r.id]*(1-habit[r.id]);
+      else habit[r.id]*=MODEL.decay;
+    }
+    trace.push({i, day:dp.day, slot:dp.slot, time:dp.time, cue:dp.cue,
+      events:s.events.filter(e=>e.day===dp.day && e.slot===dp.slot).map(e=>e.text),
+      rows, chosen:pick.id, build:habit[s.build], break:habit[s.break]});
+  });
+  const builds=trace.filter(t=>t.chosen===s.build).length;
+  const breaks=trace.filter(t=>t.rows.some(r=>r.id===s.break) && t.chosen!==s.break).length;
+  return {trace, builds, breaks};
+}
 
-/* ---------- state ---------- */
-const S = {
-  scenario:'sam',
-  count:2,
-  names:['Table 1','Table 2','Table 3','Table 4'],
-  picks:[[],[],[],[]],
-  preds:[{},{},{},{}],
-  runs:null,
-  day:-1,
-  timer:null,
+/* ---------- UI state ---------- */
+const STATE = {
+  mode:'competitive',
+  teams:{ A:{name:'Team 1', picks:[], pred:{}}, B:{name:'Team 2', picks:[], pred:{}} },
+  sim:null, simIndex:0, playing:false, timer:null,
 };
-const scn=()=>SCENARIOS[S.scenario];
-const tables=()=>Array.from({length:S.count},(_,i)=>i);
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
-const fmt=x=>(Math.round(x*10)/10).toString();
-const fmtQ=x=>(Math.round(x*4)/4).toString();
+const TEAM_KEYS = () => STATE.mode==='competitive' ? ['A','B'] : ['A'];
+const teamName = k => STATE.mode==='collaborative' ? 'The room' : STATE.teams[k].name;
+const teamColour = k => k==='A' ? 'var(--series-build)' : 'var(--series-break)';
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const $=id=>document.getElementById(id);
 
-/* ---------- navigation ---------- */
-const STEPS=['setup','rule','design','reveal','debrief'];
-const STEP_NAMES={setup:'Set up',rule:'The rule',design:'Design',reveal:'The fortnight',debrief:'Debrief'};
-function go(step){
-  stop();
-  STEPS.forEach(s=>$('s-'+s).classList.toggle('hidden', s!==step));
-  $('stepLabel').textContent = step==='setup' ? '' : `Step ${STEPS.indexOf(step)} of 4: ${STEP_NAMES[step]}`;
-  if(step==='rule') enterRule();
-  if(step==='design') enterDesign();
-  if(step==='debrief') enterDebrief();
-  window.scrollTo(0,0);
+/* ---------- screens ---------- */
+const SCREENS=['start','brief','design','sim','result'];
+function show(screen){
+  SCREENS.forEach(s=>$('screen-'+s).classList.toggle('hidden', s!==screen));
+  document.querySelectorAll('.rail .step').forEach(el=>{
+    const idx=SCREENS.indexOf(el.dataset.step), cur=SCREENS.indexOf(screen);
+    el.classList.toggle('active', idx===cur);
+    el.classList.toggle('done', idx<cur);
+  });
+  stopPlay();
+  window.scrollTo({top:0, behavior: reduced()?'auto':'smooth'});
+}
+const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- start ---------- */
+function initStart(){
+  document.querySelectorAll('#screen-start .opt[data-mode]').forEach(opt=>{
+    opt.addEventListener('click',()=>selectMode(opt.dataset.mode));
+    opt.addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){e.preventDefault();selectMode(opt.dataset.mode);} });
+  });
+  $('toBrief').addEventListener('click',()=>{ enterBrief(); show('brief'); });
+}
+function selectMode(m){
+  STATE.mode=m;
+  document.querySelectorAll('#screen-start .opt[data-mode]').forEach(o=>{
+    const on=o.dataset.mode===m; o.classList.toggle('sel',on); o.setAttribute('aria-checked',on);
+  });
 }
 
-/* ---------- 1. set up ---------- */
-function renderSetup(){
-  $('countList').innerHTML = [1,2,3,4].map(n=>`
-    <label><input type="radio" name="cnt" value="${n}" ${n===S.count?'checked':''}> ${n}</label>`).join('');
-  $('nameList').innerHTML = tables().map(i=>`
-    <label><span class="sw" style="background:${COLOURS[i]}"></span>
-      <input type="text" value="${esc(S.names[i])}" data-i="${i}" aria-label="Name of table ${i+1}" maxlength="24"></label>`).join('');
-  document.querySelectorAll('input[name=cnt]').forEach(r=>r.onchange=()=>{ S.count=+r.value; renderSetup(); });
-  document.querySelectorAll('#nameList input').forEach(inp=>inp.oninput=()=>{ S.names[+inp.dataset.i]=inp.value.trim()||`Table ${+inp.dataset.i+1}`; });
-}
-function resetPicks(){ S.picks=[[],[],[],[]]; S.preds=[{},{},{},{}]; S.runs=null; }
-
-/* ---------- 2. the rule ---------- */
-function barsHtml(slotKey, step){
-  const s=scn(), slot=s[slotKey];
-  const good=step.effGood, bad=step.effBad;
-  const max=Math.max(good,bad)+5;
-  const w=v=>Math.max(4,(v+5)/max*100);
-  const goodWins=good<bad;
-  const harder = good>bad ? `${cap(slot.goodPhrase)} takes ${fmt(good-bad)} more effort points than ${slot.badPhrase}.`
-                          : `${cap(slot.goodPhrase)} takes ${fmt(bad-good)} fewer effort points than ${slot.badPhrase}.`;
-  return `<div class="choicepoint">
-    <div class="when">${slot.time}</div>
-    <div class="bar-row ${goodWins?'wins':''}"><span class="lab">${esc(slot.good)}</span><div class="bar"><i style="width:${w(good)}%"></i></div></div>
-    <div class="bar-row ${goodWins?'':'wins'}"><span class="lab">${esc(slot.bad)}</span><div class="bar"><i style="width:${w(bad)}%"></i></div></div>
-    <div class="gapline">${harder} ${esc(s.person)} takes the shorter bar: ${esc((goodWins?slot.good:slot.bad).toLowerCase())}.</div>
-  </div>`;
-}
-function enterRule(){
-  const s=scn(), base=simulate([]);
-  $('ruleTitle').textContent=`${s.person} does whatever takes less effort.`;
-  $('ruleIntro').textContent=s.intro;
-  $('ruleChoices').innerHTML=barsHtml('am',base.am[0])+barsHtml('pm',base.pm[0]);
-  $('ruleQuestion').textContent=s.question;
-  $('ruleResult').classList.add('hidden');
-  $('ruleRun').classList.remove('hidden');
-  $('ruleRun').onclick=()=>{
-    $('ruleResult').innerHTML = calHtml(base, MODEL.days, 'var(--ink)') +
-      `<p class="big-result">${esc(s.after(base.amCount, base.pmCount))}</p>`;
-    $('ruleResult').classList.remove('hidden');
-    $('ruleRun').classList.add('hidden');
-  };
-}
-function calHtml(run, upto, colour, slots){
-  const s=scn();
-  slots=slots||['am','pm'];
-  const label=slots.map(k=>`${s[k].row}: ${countTo(run[k],upto)} of ${upto}.`).join(' ');
-  let h='<div class="cal" role="img" aria-label="'+esc(label)+'"><span></span>';
-  for(let d=0; d<MODEL.days; d++) h+=`<span class="dn">${d+1}</span>`;
-  for(const slot of slots){
-    h+=`<span class="rl">${esc(s[slot].row)}</span>`;
-    for(let d=0; d<MODEL.days; d++){
-      if(d>=upto){ h+='<span class="c"></span>'; continue; }
-      h+= run[slot][d].good ? `<span class="c" style="background:${colour};border-color:${colour}"></span>` : '<span class="c no"></span>';
-    }
-  }
-  return h+'</div>';
-}
-const countTo=(arr,upto)=>arr.slice(0,upto).filter(x=>x.good).length;
-
-/* ---------- 3. design ---------- */
-function spent(i){ return S.picks[i].reduce((t,id)=>t+CARD_FX[id].cost,0); }
-function enterDesign(){
-  const s=scn();
-  $('designIntro').textContent=s.designIntro;
-  renderMatrix();
-}
-function renderMatrix(){
-  const s=scn(), T=tables();
-  let h='<thead><tr><th>Card</th><th>Cost</th>'+T.map(i=>`<th class="tick"><span class="th-team"><span class="sw" style="background:${COLOURS[i]}"></span>${esc(S.names[i])}</span></th>`).join('')+'</tr></thead><tbody>';
-  CARD_IDS.forEach(id=>{
-    h+=`<tr><td>${esc(s.cards[id].name)}</td><td class="cost">${CARD_FX[id].cost} pt</td>`;
-    T.forEach(i=>{
-      const on=S.picks[i].includes(id);
-      const can=on || spent(i)+CARD_FX[id].cost<=MODEL.budget;
-      h+=`<td class="tick"><input type="checkbox" data-t="${i}" data-c="${id}" ${on?'checked':''} ${can?'':'disabled'} aria-label="${esc(S.names[i]+': '+s.cards[id].name)}"></td>`;
+/* ---------- brief ---------- */
+function enterBrief(){
+  const s=sc();
+  $('briefEyebrow').textContent='Brief · '+(STATE.mode==='competitive'?'Two teams':'Whole room');
+  $('briefTitle').textContent=s.name;
+  $('briefBlurb').textContent=s.blurb;
+  $('briefBuild').textContent=s.buildLabel;
+  $('briefBuildSub').textContent=s.buildSub;
+  $('briefBreak').textContent=s.breakLabel;
+  $('briefBreakSub').textContent=s.breakSub;
+  $('briefBudget').textContent=MODEL.budget+' pts';
+  const w=$('briefWeek'); w.innerHTML='';
+  for(let d=0; d<MODEL.days; d++){
+    const c=document.createElement('div'); c.className='dayc';
+    let h=`<h4>DAY ${d+1} · ${DAY_NAMES[d%7].toUpperCase()}</h4>`;
+    s.slots.forEach(sl=>{
+      const ev=s.events.find(e=>e.day===d && e.slot===sl.key);
+      h+=`<div class="cue"><span class="t">${sl.time}</span><span>${ev?ev.short:'&nbsp;'}</span></div>`;
     });
-    h+='</tr>';
-  });
-  h+='<tr class="sum"><td>Points left</td><td></td>'+T.map(i=>`<td class="tick">${MODEL.budget-spent(i)} of ${MODEL.budget}</td>`).join('')+'</tr>';
-  h+=`<tr class="pred"><td>Prediction: ${esc(s.am.row.toLowerCase())}, out of 14</td><td></td>`+T.map(i=>`<td class="tick"><input type="number" min="0" max="14" data-t="${i}" data-p="am" value="${S.preds[i].am??''}" aria-label="${esc(S.names[i])} prediction, ${s.am.unit}"></td>`).join('')+'</tr>';
-  h+=`<tr class="pred"><td>Prediction: ${esc(s.pm.row.toLowerCase())}, out of 14</td><td></td>`+T.map(i=>`<td class="tick"><input type="number" min="0" max="14" data-t="${i}" data-p="pm" value="${S.preds[i].pm??''}" aria-label="${esc(S.names[i])} prediction, ${s.pm.unit}"></td>`).join('')+'</tr>';
-  h+='</tbody>';
-  $('matrix').innerHTML=h;
-  $('matrix').querySelectorAll('input[type=checkbox]').forEach(cb=>cb.onchange=()=>{
-    const i=+cb.dataset.t, id=cb.dataset.c, p=S.picks[i];
-    if(cb.checked){ if(!p.includes(id)) p.push(id); } else { p.splice(p.indexOf(id),1); }
-    renderMatrix();
-    const again=$('matrix').querySelector(`input[data-t="${i}"][data-c="${id}"]`); if(again) again.focus();
-  });
-  $('matrix').querySelectorAll('input[type=number]').forEach(inp=>inp.oninput=()=>{
-    const v=inp.value===''?undefined:Math.max(0,Math.min(14,Math.round(+inp.value)));
-    S.preds[+inp.dataset.t][inp.dataset.p]=v;
-  });
-}
-
-/* ---------- 4. the fortnight ---------- */
-function startReveal(){
-  S.runs=tables().map(i=>simulate(S.picks[i]));
-  S.day=-1;
-  const s=scn();
-  $('teams').className='teams'+(S.count===1?' one':'');
-  $('teams').innerHTML=tables().map(i=>`
-    <div class="team">
-      <h3><span class="sw" style="background:${COLOURS[i]}"></span>${esc(S.names[i])}</h3>
-      <div id="cal-${i}"></div>
-      <div class="gap" id="gap-${i}"></div>
-      <div class="tally" id="tally-${i}"></div>
-      <div class="log" id="log-${i}"></div>
-    </div>`).join('');
-  $('gapKey').textContent=`The chart shows how much more effort the intended option takes than the old one. Solid line: ${s.am.time}. Dashed line: ${s.pm.time}. Below the middle line, ${s.person} does the intended thing.`;
-  go('reveal');
-  renderDay();
-  play();
-}
-function renderDay(){
-  const s=scn(), upto=S.day+1;
-  $('dayTitle').textContent = S.day<0 ? 'Before day 1' : `Day ${upto} of 14 · ${DAY_NAMES[S.day%7]}`;
-  const ev = S.day<0 ? [] : EVENT_FX.filter(e=>e.day===S.day).map(e=>s.events[e.key]);
-  $('events').innerHTML = ev.map(t=>`<div>${esc(t)}</div>`).join('');
-  tables().forEach(i=>{
-    const r=S.runs[i];
-    $('cal-'+i).innerHTML=calHtml(r, upto, COLOURS[i]);
-    $('gap-'+i).innerHTML=gapChart(r, upto, COLOURS[i]);
-    const am=countTo(r.am,upto), pm=countTo(r.pm,upto);
-    const pr=S.preds[i];
-    const done = upto===MODEL.days;
-    $('tally-'+i).innerHTML = `${esc(s.am.row)}: <b>${am}</b> of ${upto}`+(done&&pr.am!==undefined?` <span class="muted">(predicted ${pr.am})</span>`:'')+
-      ` &nbsp; ${esc(s.pm.row)}: <b>${pm}</b> of ${upto}`+(done&&pr.pm!==undefined?` <span class="muted">(predicted ${pr.pm})</span>`:'');
-    $('log-'+i).innerHTML = switchNotes(r, upto).map(t=>`<div>${esc(t)}</div>`).join('');
-  });
-  $('playBtn').textContent = S.timer ? 'Pause' : 'Play';
-}
-function switchNotes(r, upto){
-  const s=scn(), notes=[];
-  for(const slot of ['am','pm']){
-    const sl=s[slot];
-    for(let d=0; d<upto; d++){
-      const prev = d===0 ? false : r[slot][d-1].good;
-      const now = r[slot][d].good;
-      if(now && !prev) notes.push({d, t: d===0 ? `From day 1, ${sl.goodPhrase} is easier than ${sl.badPhrase}.`
-                                              : `Day ${d+1}: ${sl.goodPhrase} became easier than ${sl.badPhrase}.`});
-      if(!now && prev) notes.push({d, t:`Day ${d+1}: ${sl.badPhrase} was easier again.`});
-    }
+    c.innerHTML=h; w.appendChild(c);
   }
-  return notes.sort((a,b)=>a.d-b.d).map(n=>cap(n.t));
-}
-function gapChart(r, upto, colour){
-  const W=600, H=230, L=40, R=110, Tp=12, B=26;
-  const lo=-9, hi=9;
-  const x=d=>L+(W-L-R)*d/(MODEL.days-1);
-  const y=v=>Tp+(H-Tp-B)*(hi-Math.max(lo,Math.min(hi,v)))/(hi-lo);
-  let g=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Effort gap by day">`;
-  g+=`<rect x="${L}" y="${y(0)}" width="${W-L-R}" height="${y(lo)-y(0)}" fill="#f1efe9"/>`;
-  g+=`<line x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}" stroke="#1b1b1b" stroke-width="1.5"/>`;
-  g+=`<text x="${W-R+10}" y="${y(0)-30}" font-size="14" fill="#555049"><tspan x="${W-R+10}">Old habit</tspan><tspan x="${W-R+10}" dy="16">wins</tspan></text>`;
-  g+=`<text x="${W-R+10}" y="${y(0)+24}" font-size="14" fill="#555049"><tspan x="${W-R+10}">Intended</tspan><tspan x="${W-R+10}" dy="16">option wins</tspan></text>`;
-  [-6,-3,0,3,6].forEach(v=>{ g+=`<text x="${L-8}" y="${y(v)+5}" font-size="13" fill="#555049" text-anchor="end">${v>0?'+':''}${v}</text>`; });
-  [0,6,13].forEach(d=>{ g+=`<text x="${x(d)}" y="${H-6}" font-size="13" fill="#555049" text-anchor="middle">Day ${d+1}</text>`; });
-  if(upto>0){
-    for(const [slot,dash] of [['am',''],['pm','7 5']]){
-      const pts=r[slot].slice(0,upto).map((p,d)=>`${x(d)},${y(p.gap)}`).join(' ');
-      if(upto>1) g+=`<polyline points="${pts}" fill="none" stroke="${colour}" stroke-width="3" ${dash?`stroke-dasharray="${dash}"`:''}/>`;
-      r[slot].slice(0,upto).forEach((p,d)=>{ g+=`<circle cx="${x(d)}" cy="${y(p.gap)}" r="4" fill="${p.good?colour:'#ffffff'}" stroke="${colour}" stroke-width="2"/>`; });
-    }
-  }
-  return g+'</svg>';
-}
-function step(n){
-  S.day=Math.max(-1,Math.min(MODEL.days-1,S.day+n));
-  renderDay();
-}
-function play(){
-  if(S.timer) return;
-  if(S.day>=MODEL.days-1) S.day=-1;
-  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  S.timer=setInterval(()=>{
-    if(S.day>=MODEL.days-1){ stop(); return; }
-    step(1);
-  }, reduced?2200:1400);
-  renderDay();
-}
-function stop(){
-  if(S.timer){ clearInterval(S.timer); S.timer=null; }
-  if($('playBtn')) $('playBtn').textContent='Play';
+  $('toDesign').onclick=()=>{ enterDesign(); show('design'); };
 }
 
-/* ---------- 5. debrief ---------- */
-function enterDebrief(){
-  const s=scn();
-  let h='<thead><tr><th>Card</th><th>What it changed</th><th>Type</th><th>Bought by</th></tr></thead><tbody>';
-  CARD_IDS.forEach(id=>{
-    const c=s.cards[id];
-    const by=tables().filter(i=>S.picks[i].includes(id));
-    h+=`<tr><td><b>${esc(c.name)}</b> <span class="muted small" style="white-space:nowrap">${CARD_FX[id].cost} pt</span></td><td>${esc(c.back)}</td><td class="kind">${esc(c.kind)}</td>
-      <td><div class="dots">${by.map(i=>`<span class="by"><span class="dot" style="background:${COLOURS[i]}"></span>${esc(S.names[i])}</span>`).join('')||'<span class="muted">None</span>'}</div></td></tr>`;
+/* ---------- design ---------- */
+function enterDesign(){
+  const arena=$('designArena');
+  arena.className='arena'+(STATE.mode==='collaborative'?' solo':'');
+  arena.innerHTML='';
+  TEAM_KEYS().forEach(k=>arena.appendChild(teamDesignPanel(k)));
+  syncDesign();
+  $('toSim').onclick=startSimulation;
+}
+function spentOf(k){ const s=sc(); return STATE.teams[k].picks.reduce((t,id)=>t+s.interventions.find(x=>x.id===id).cost,0); }
+function teamDesignPanel(key){
+  const s=sc(), team=STATE.teams[key];
+  const panel=document.createElement('div'); panel.className='team-panel'; panel.dataset.team=key;
+  let h=`<div class="team-head">
+      <span class="team-name" style="color:${teamColour(key)}">${STATE.mode==='collaborative'?'The room':
+        `<input class="name-input" value="${team.name}" maxlength="20" aria-label="Team name" data-team="${key}">`}</span>
+      <span class="budget-badge mono" id="badge-${key}"></span>
+    </div><div class="pick-group">`;
+  s.interventions.forEach(iv=>{
+    h+=`<div class="pick" data-team="${key}" data-iv="${iv.id}" role="checkbox" aria-checked="false" tabindex="0">
+      <span class="box"><svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg></span>
+      <span class="pl"><b>${iv.label}</b></span>
+      <span class="pc">${iv.cost} pt</span></div>`;
   });
-  h+='</tbody>';
-  $('cardTable').innerHTML=h;
+  h+=`</div><div class="preds">
+      <div class="glabel">Your prediction</div>
+      <label>Walks outside, out of 14 <input type="number" min="0" max="14" data-team="${key}" data-p="build" value="${team.pred.build??''}"></label>
+      <label>Nights without email, out of 14 <input type="number" min="0" max="14" data-team="${key}" data-p="break" value="${team.pred.break??''}"></label>
+    </div>`;
+  panel.innerHTML=h;
+  panel.querySelectorAll('.pick').forEach(p=>{
+    const toggle=()=>togglePick(p.dataset.team,p.dataset.iv);
+    p.addEventListener('click',toggle);
+    p.addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){e.preventDefault();toggle();} });
+  });
+  panel.querySelectorAll('.preds input').forEach(inp=>inp.addEventListener('input',()=>{
+    STATE.teams[inp.dataset.team].pred[inp.dataset.p] = inp.value==='' ? undefined : clamp(Math.round(+inp.value),0,14);
+  }));
+  const ni=panel.querySelector('.name-input');
+  if(ni) ni.addEventListener('input',()=>{ STATE.teams[key].name=ni.value.trim()||(key==='A'?'Team 1':'Team 2'); });
+  return panel;
+}
+function togglePick(key, id){
+  const s=sc(), team=STATE.teams[key], idx=team.picks.indexOf(id);
+  if(idx>=0) team.picks.splice(idx,1);
+  else{
+    const iv=s.interventions.find(x=>x.id===id);
+    if(spentOf(key)+iv.cost>MODEL.budget) return;
+    team.picks.push(id);
+  }
+  syncDesign();
+}
+function syncDesign(){
+  const s=sc();
+  TEAM_KEYS().forEach(k=>{
+    const panel=document.querySelector(`.team-panel[data-team="${k}"]`); if(!panel) return;
+    const picks=STATE.teams[k].picks, spent=spentOf(k);
+    panel.querySelectorAll('.pick').forEach(p=>{
+      const on=picks.includes(p.dataset.iv), iv=s.interventions.find(x=>x.id===p.dataset.iv);
+      p.classList.toggle('on',on); p.setAttribute('aria-checked',on);
+      p.classList.toggle('disabled', !on && spent+iv.cost>MODEL.budget);
+    });
+    $('badge-'+k).textContent=`${MODEL.budget-spent} of ${MODEL.budget} pts left`;
+  });
+}
 
-  $('sliderTitle').textContent='How much change does it take?';
-  $('sliderIntro').textContent=`No cards, the same fortnight. Drag the slider to take effort away from ${s.am.goodPhrase} and watch what happens.`;
-  $('sliderLabel').textContent=`Effort points removed from ${s.am.goodPhrase}`;
-  const curve=[];
-  for(let v=0; v<=6.0001; v+=0.25) curve.push({v, n:simulate([],[['amGood',-v]]).amCount});
-  const lastZero=curve.filter(c=>c.n===0).pop();
-  const firstSome=curve.find(c=>c.n>0);
-  const firstAll=curve.find(c=>c.n===MODEL.days);
+/* ---------- simulation ---------- */
+function startSimulation(){
+  const s=sc(), results={};
+  TEAM_KEYS().forEach(k=>{ results[k]=simulate(s, STATE.teams[k].picks); });
+  STATE.sim={results, baseline:simulate(s, [])};
+  STATE.simIndex=0;
+  buildSimStages();
+  renderSimStep();
+  show('sim');
+  setTimeout(startPlay, 500);
+}
+function buildSimStages(){
+  const grid=$('simGrid');
+  grid.className='sim-grid'+(STATE.mode==='collaborative'?' solo':'');
+  grid.innerHTML='';
+  TEAM_KEYS().forEach(k=>{
+    const st=document.createElement('div'); st.className='stage'; st.dataset.team=k;
+    st.innerHTML=`
+      <div class="team-head">
+        <span class="team-name" style="color:${teamColour(k)}">${teamName(k)}</span>
+        <span class="prob" id="count-${k}"></span>
+      </div>
+      <div class="cue-line"><span class="clock" id="clock-${k}"></span><span class="txt" id="cue-${k}"></span></div>
+      <div id="design-${k}"></div>
+      <div id="cands-${k}"></div>
+      <div class="meters">
+        <div class="meter build"><div class="ml"><span>Walk habit</span><span class="val" id="mb-${k}">0%</span></div><div class="track"><div class="fill" id="mbf-${k}"></div></div></div>
+        <div class="meter break"><div class="ml"><span>Email-in-bed habit</span><span class="val" id="mk-${k}">0%</span></div><div class="track"><div class="fill" id="mkf-${k}"></div></div></div>
+      </div>`;
+    grid.appendChild(st);
+  });
+}
+function renderSimStep(){
+  const s=sc(), i=STATE.simIndex, first=STATE.sim.results[TEAM_KEYS()[0]].trace;
+  $('simProgress').style.width=((i+1)/first.length*100)+'%';
+  const t0=first[i];
+  $('simDayFlag').textContent=`Day ${t0.day+1} · ${DAY_NAMES[t0.day%7]} ${t0.time}`;
+  $('simEvent').textContent=t0.events.join(' ');
+  $('simEvent').classList.toggle('hidden', !t0.events.length);
+  TEAM_KEYS().forEach(k=>{
+    const tr=STATE.sim.results[k].trace, t=tr[i];
+    $('clock-'+k).textContent=t.time;
+    $('cue-'+k).textContent=t.cue;
+    const walks=tr.slice(0,i+1).filter(x=>x.chosen===s.build).length;
+    const offEmail=tr.slice(0,i+1).filter(x=>x.rows.some(r=>r.id===s.break) && x.chosen!==s.break).length;
+    $('count-'+k).textContent=`Walks: ${walks} · Nights off email: ${offEmail}`;
+    $('design-'+k).innerHTML=designBoxHtml(s, STATE.teams[k].picks, t);
+    const wrap=$('cands-'+k); wrap.innerHTML='';
+    const effs=t.rows.map(r=>r.eff);
+    const eMin=Math.min(...effs), eMax=Math.max(...effs), range=Math.max(1.5,eMax-eMin);
+    const axisMin=eMin-0.28*range, axisMax=eMax+0.14*range;
+    t.rows.forEach(r=>wrap.appendChild(candidateEl(r, t.chosen===r.id, axisMin, axisMax)));
+    setMeter(k,'b',t.build); setMeter(k,'k',t.break);
+  });
+}
+function setMeter(k, which, v){
+  const pct=Math.round(clamp(v,0,1)*100);
+  $('m'+which+'-'+k).textContent=pct+'%';
+  $('m'+which+'f-'+k).style.width=pct+'%';
+}
+function designBoxHtml(s, picks, t){
+  const items=[];
+  t.rows.forEach(r=>{
+    picks.forEach(id=>{
+      const iv=s.interventions.find(x=>x.id===id);
+      let c=null;
+      if(iv.target===r.id) c=iv.mod; else if(iv.mod2Target===r.id) c=iv.mod2;
+      if(c===null) return;
+      const kind = Math.abs(c)<0.05 ? 'flat' : (c<0?'easier':'harder');
+      items.push({label:iv.label, note:iv.note, kind, actionLabel:r.label, tag:r.tag});
+    });
+  });
+  if(!items.length) return `<div class="design-box empty">None of your cards act on this decision. Both options run on
+    starting effort, habit and time of day.</div>`;
+  const arrow={easier:'↓', harder:'↑', flat:'='};
+  return `<div class="design-box"><div class="db-head">Your cards at this decision</div>${items.map(it=>{
+    const tagCls = it.tag==='build'?'tag-build':it.tag==='break'?'tag-break':'neutral';
+    return `<div class="db-item ${it.kind}"><span class="ar">${arrow[it.kind]}</span><span><b>${it.label}.</b> ${it.note}<span class="db-tag ${tagCls}">${it.actionLabel}</span></span></div>`;
+  }).join('')}</div>`;
+}
+function candidateEl(r, chosen, axisMin, axisMax){
+  const el=document.createElement('div'); el.className='candidate'+(chosen?' chosen':'');
+  const tagHtml = r.tag==='build' ? '<span class="tag-pill tag-build">habit to build</span>'
+                : r.tag==='break' ? '<span class="tag-pill tag-break">habit to break</span>' : '';
+  const barPct=clamp((r.eff-axisMin)/(axisMax-axisMin),0.05,1)*100;
+  const terms=[`<span class="term"><b>${r.base.toFixed(1)}</b> <small>starting effort</small></span>`];
+  const signed=(v,label)=>`<span class="term ${v<0?'easier':'harder'}"><b>${v<0?'−':'+'}${Math.abs(v).toFixed(1)}</b> <small>${label}</small></span>`;
+  if(Math.abs(r.friction)>0.05) terms.push(signed(r.friction,'your cards'));
+  if(r.habitBonus>0.05) terms.push(signed(-r.habitBonus,'habit'));
+  if(r.drive>0.05) terms.push(signed(-r.drive,'time of day'));
+  if(Math.abs(r.event)>0.05) terms.push(signed(r.event,'today'));
+  terms.push(`<span class="term eq"><b>= ${r.eff.toFixed(1)}</b> <small>effort</small></span>`);
+  el.innerHTML=`
+    <div class="cand-top"><span class="cand-name">${r.label}${tagHtml}</span><span class="chosen-flag">Chosen</span></div>
+    <div class="effbar-row">
+      <div class="effbar"><i class="${chosen?'win':'lose'}" style="width:${barPct}%"></i></div>
+      <span class="net">${r.eff.toFixed(1)}<small>effort</small></span>
+    </div>
+    <div class="breakdown">${terms.join('')}</div>`;
+  return el;
+}
+function startPlay(){
+  if(STATE.playing) return;
+  STATE.playing=true; setPlayLabel();
+  if(reduced()) return;
+  STATE.timer=setInterval(()=>{
+    if(STATE.simIndex>=STATE.sim.results[TEAM_KEYS()[0]].trace.length-1){ stopPlay(); return; }
+    STATE.simIndex++; renderSimStep();
+  }, MODEL.autoStepMs);
+}
+function stopPlay(){ STATE.playing=false; if(STATE.timer){clearInterval(STATE.timer); STATE.timer=null;} setPlayLabel(); }
+function setPlayLabel(){ const b=$('simPlay'); if(b) b.textContent=STATE.playing?'Pause':'Play'; }
+function bindSimTransport(){
+  $('simPlay').onclick=()=>{ STATE.playing?stopPlay():startPlay(); };
+  $('simNext').onclick=()=>{ stopPlay(); const n=STATE.sim.results[TEAM_KEYS()[0]].trace.length; if(STATE.simIndex<n-1){STATE.simIndex++; renderSimStep();} };
+  $('simPrev').onclick=()=>{ stopPlay(); if(STATE.simIndex>0){STATE.simIndex--; renderSimStep();} };
+  $('simSkip').onclick=()=>{ stopPlay(); enterResult(); show('result'); };
+}
+
+/* ---------- results ---------- */
+function summary(k){
+  const s=sc(), r=STATE.sim.results[k], picks=STATE.teams[k].picks;
+  const ivs=picks.map(id=>s.interventions.find(x=>x.id===id));
+  const spent=ivs.reduce((t,iv)=>t+iv.cost,0);
+  const wasted=ivs.filter(iv=>iv.pseudo).reduce((t,iv)=>t+iv.cost,0);
+  const touchesBuild=ivs.some(iv=>iv.target===s.build && iv.mod<0);
+  const touchesBreak=ivs.some(iv=>iv.target===s.break);
+  const idleReward=ivs.some(iv=>iv.reward) && r.builds===0;
+  return {r, ivs, spent, wasted, touchesBuild, touchesBreak, idleReward, total:r.builds+r.breaks};
+}
+function enterResult(){
+  const grid=$('resultGrid');
+  grid.className='result-grid'+(STATE.mode==='collaborative'?' solo':'');
+  grid.innerHTML='';
+  const sums={}; TEAM_KEYS().forEach(k=>sums[k]=summary(k));
+  let winner=null;
+  if(STATE.mode==='competitive' && sums.A.total!==sums.B.total) winner = sums.A.total>sums.B.total?'A':'B';
+  TEAM_KEYS().forEach(k=>grid.appendChild(scorecard(k, sums[k], winner===k)));
+  $('compareCallout').innerHTML=comparisonText(sums, winner);
+  renderSlider();
+  $('questions').innerHTML=sc().questions.map(q=>`<li>${q}</li>`).join('');
+  $('redesignBtn').onclick=()=>{ enterDesign(); show('design'); };
+  $('newGameBtn').onclick=()=>{ resetGame(); show('start'); };
+}
+function scorecard(k, m, isWinner){
+  const pred=STATE.teams[k].pred;
+  const el=document.createElement('div'); el.className='scorecard'+(isWinner?' winner':'');
+  const vs=(n,p)=> p===undefined ? '' : ` <small style="color:var(--ink-soft)">(predicted ${p})</small>`;
+  let items = m.ivs.length ? '' : '<div class="d-item">No cards bought. Nothing changed, so Sam never walked and checked email every night.</div>';
+  m.ivs.forEach(iv=>{
+    items+=`<div class="d-item ${iv.pseudo?'pseudo':''}"><span class="pr">${iv.label}</span><small>${iv.note}</small></div>`;
+  });
+  el.innerHTML=`
+    ${isWinner?'<span class="crown">Winner</span>':''}
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+      <span class="team-name" style="color:${teamColour(k)}">${teamName(k)}</span>
+      <div style="text-align:right"><div class="grade">${m.total}</div><div style="color:var(--ink-soft);font-size:.85rem">recovery choices out of 28</div></div>
+    </div>
+    <div class="stat-rows">
+      <div class="row"><span>Walks outside</span><span class="mono">${m.r.builds} of 14${vs(m.r.builds,pred.build)}</span></div>
+      <div class="row"><span>Nights without email</span><span class="mono">${m.r.breaks} of 14${vs(m.r.breaks,pred.break)}</span></div>
+      <div class="row"><span>With no changes</span><span class="mono">${STATE.sim.baseline.builds} and ${STATE.sim.baseline.breaks}</span></div>
+      <div class="row"><span>Points on cards that changed nothing</span><span class="mono">${m.wasted} of ${m.spent}</span></div>
+    </div>
+    <div class="debrief"><h4>What each card did</h4>${items}</div>`;
+  return el;
+}
+function notesFor(k, m){
+  const n=[], who=teamName(k);
+  if(m.wasted) n.push(`${who} spent ${m.wasted} pt on a card that changed nothing at 13:00 or 22:30.`);
+  if(m.ivs.length && !m.touchesBuild) n.push(`${who} bought nothing that made the walk easier, so the walk never started.`);
+  if(m.ivs.length && !m.touchesBreak) n.push(`${who} bought nothing that made email in bed harder, so that habit stayed.`);
+  if(m.idleReward) n.push(`${who}'s coffee card did nothing, because Sam never took a first walk to reward.`);
+  const s=sc(), tr=m.r.trace;
+  const first=pred=>{ const t=tr.find(pred); return t ? t.day+1 : null; };
+  const w=first(t=>t.chosen===s.build), e=first(t=>t.rows.some(r=>r.id===s.break) && t.chosen!==s.break);
+  if(w && w>1) n.push(`For ${who}, the first walk came on day ${w}.`);
+  if(e && e>1) n.push(`For ${who}, the first night without email came on day ${e}.`);
+  return n;
+}
+function comparisonText(sums, winner){
+  if(STATE.mode==='collaborative'){
+    const m=sums.A;
+    return `<b>The room's design.</b> Sam walked on ${m.r.builds} of 14 days and stayed off email on ${m.r.breaks} of 14
+      nights. With no changes, both would have been 0. ${notesFor('A',m).join(' ')}`;
+  }
+  const a=sums.A, b=sums.B;
+  let msg = winner
+    ? `<b>${teamName(winner)} won, ${sums[winner].total} to ${sums[winner==='A'?'B':'A'].total}.</b> `
+    : `<b>A draw at ${a.total} each.</b> `;
+  if(winner) msg += `Both teams had the same budget and Sam faced the same fortnight, so the difference comes from the cards. `;
+  msg += [...notesFor('A',a), ...notesFor('B',b)].join(' ');
+  return msg;
+}
+function renderSlider(){
+  const s=sc(), curve=[];
+  for(let v=0; v<=6.0001; v+=0.25) curve.push({v, n:simulate(s, [], [['walk',-v]]).builds});
+  const q=x=>(Math.round(x*4)/4).toString();
+  const lastZero=curve.filter(c=>c.n===0).pop(), firstSome=curve.find(c=>c.n>0), firstAll=curve.find(c=>c.n===MODEL.days);
+  $('sliderIntro').textContent='No cards and the same fortnight. Drag the slider to take effort away from the walk.';
   $('sliderFinding').textContent = (lastZero && firstSome)
-    ? `Removing ${fmtQ(lastZero.v)} points changes nothing: 0 ${s.am.unit} out of 14. Removing ${fmtQ(firstSome.v)} points gives ${firstSome.n}.`+
-      (firstAll?` Removing ${fmtQ(firstAll.v)} gives all 14. `:' ')+
-      `Once ${s.person} does it a few times, the habit makes it easier still, so a small push early in the fortnight has a large effect by the end.`
+    ? `Removing ${q(lastZero.v)} points changes nothing: 0 walks. Removing ${q(firstSome.v)} gives ${firstSome.n}.`+
+      (firstAll?` Removing ${q(firstAll.v)} gives all 14.`:'')+
+      ` Each walk builds the habit and makes the next walk easier, so a small change early in the fortnight has a large effect by the end.`
     : '';
   const slider=$('slider');
   const draw=()=>{
-    const v=+slider.value, r=simulate([],[['amGood',-v]]);
-    $('sliderX').textContent=`${fmtQ(v)} points removed`;
-    $('sliderY').textContent=`${s.am.row}: ${r.amCount} of 14 ${s.am.unit}`;
-    $('sliderCal').innerHTML=calHtml(r, MODEL.days, 'var(--ink)', ['am']);
-    $('sliderChart').innerHTML=curveChart(curve, v);
+    const v=+slider.value, n=simulate(s, [], [['walk',-v]]).builds;
+    $('sliderX').textContent=`${q(v)} points removed`;
+    $('sliderY').textContent=`Walks: ${n} of 14`;
+    $('sliderChart').innerHTML=curveChart(curve, v, n);
   };
-  slider.value=0;
-  slider.oninput=draw;
-  draw();
-  $('questions').innerHTML=s.questions.map(q=>`<li>${esc(q)}</li>`).join('');
+  slider.value=0; slider.oninput=draw; draw();
 }
-function curveChart(curve, v){
-  const W=600, H=200, L=40, R=20, Tp=14, B=30;
-  const x=t=>L+(W-L-R)*t/6, y=n=>Tp+(H-Tp-B)*(1-n/14);
-  let g=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Days out of 14 against effort removed">`;
-  [0,7,14].forEach(n=>{ g+=`<line x1="${L}" x2="${W-R}" y1="${y(n)}" y2="${y(n)}" stroke="#d6d1c7"/><text x="${L-8}" y="${y(n)+5}" font-size="13" fill="#555049" text-anchor="end">${n}</text>`; });
-  [0,1,2,3,4,5,6].forEach(t=>{ g+=`<text x="${x(t)}" y="${H-8}" font-size="13" fill="#555049" text-anchor="middle">${t}</text>`; });
-  let d=''; curve.forEach((c,i)=>{ d+=(i?` H${x(c.v)} V${y(c.n)}`:`M${x(c.v)},${y(c.n)}`); });
-  g+=`<path d="${d}" fill="none" stroke="#1b1b1b" stroke-width="3"/>`;
-  const cur=curve.reduce((a,c)=>Math.abs(c.v-v)<Math.abs(a.v-v)?c:a);
-  g+=`<line x1="${x(v)}" x2="${x(v)}" y1="${Tp}" y2="${H-B}" stroke="#555049" stroke-dasharray="4 4"/>`;
-  g+=`<circle cx="${x(v)}" cy="${y(cur.n)}" r="7" fill="#1b1b1b"/>`;
+function curveChart(curve, v, n){
+  const W=600, H=190, L=36, R=14, T=12, B=28;
+  const x=t=>L+(W-L-R)*t/6, y=k=>T+(H-T-B)*(1-k/14);
+  let g=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Walks out of 14 against effort removed" style="width:100%;height:auto;display:block">`;
+  [0,7,14].forEach(k=>{ g+=`<line x1="${L}" x2="${W-R}" y1="${y(k)}" y2="${y(k)}" stroke="var(--line)"/><text x="${L-8}" y="${y(k)+4}" font-size="12" fill="var(--ink-soft)" text-anchor="end">${k}</text>`; });
+  for(let t=0;t<=6;t++) g+=`<text x="${x(t)}" y="${H-8}" font-size="12" fill="var(--ink-soft)" text-anchor="middle">${t}</text>`;
+  let d=''; curve.forEach((c,i)=>{ d+= i ? ` H${x(c.v)} V${y(c.n)}` : `M${x(c.v)},${y(c.n)}`; });
+  g+=`<path d="${d}" fill="none" stroke="var(--series-build)" stroke-width="3"/>`;
+  g+=`<line x1="${x(v)}" x2="${x(v)}" y1="${T}" y2="${H-B}" stroke="var(--ink-soft)" stroke-dasharray="4 4"/>`;
+  g+=`<circle cx="${x(v)}" cy="${y(n)}" r="7" fill="var(--accent)"/>`;
   return g+'</svg>';
 }
-
-/* ---------- print ---------- */
-function buildPrint(){
-  const s=scn();
-  let h='<div class="pcards">';
-  CARD_IDS.forEach(id=>{ h+=`<div class="pcard"><div class="t">${esc(s.cards[id].name)}</div><div class="cost">${CARD_FX[id].cost} pt</div></div>`; });
-  h+='</div>';
-  tables().forEach(i=>{
-    h+=`<div class="psheet"><h2>${esc(S.names[i])}: ${esc(s.title)}</h2>
-      <p>Budget: ${MODEL.budget} points. Write down the cards you choose.</p>
-      <div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
-      <p>Prediction. ${esc(s.am.row)}: how many of 14 ${s.am.unit}?</p><div class="line"></div>
-      <p>Prediction. ${esc(s.pm.row)}: how many of 14 ${s.pm.unit}?</p><div class="line"></div></div>`;
-  });
-  $('print').innerHTML=h;
+function resetGame(){
+  STATE.teams={A:{name:'Team 1',picks:[],pred:{}}, B:{name:'Team 2',picks:[],pred:{}}};
+  STATE.sim=null; STATE.simIndex=0;
 }
 
-/* ---------- check: every affordable design, for calibration ---------- */
+/* ---------- theme ---------- */
+function initTheme(){
+  setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  $('themeToggle').addEventListener('click',()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
+}
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  $('themeLabel').textContent = t==='dark'?'Light mode':'Dark mode';
+}
+
+/* ---------- check: every affordable design ---------- */
 function check(){
-  const rows=[];
-  for(let m=0; m<1<<CARD_IDS.length; m++){
-    const p=CARD_IDS.filter((_,i)=>m>>i&1);
-    const cost=p.reduce((t,id)=>t+CARD_FX[id].cost,0);
+  const s=sc(), ids=s.interventions.map(i=>i.id), rows=[];
+  for(let m=0; m<1<<ids.length; m++){
+    const p=ids.filter((_,i)=>m>>i&1);
+    const cost=p.reduce((t,id)=>t+s.interventions.find(x=>x.id===id).cost,0);
     if(cost>MODEL.budget) continue;
-    const r=simulate(p);
-    rows.push({cards:p.join(' '), cost, lunchtime:r.amCount, evening:r.pmCount, total:r.amCount+r.pmCount});
+    const r=simulate(s,p);
+    rows.push({cards:p.join(' '), cost, walks:r.builds, nightsOffEmail:r.breaks, total:r.builds+r.breaks});
   }
   rows.sort((a,b)=>b.total-a.total);
   console.table(rows);
@@ -728,28 +1010,12 @@ function check(){
 
 /* ---------- boot ---------- */
 function boot(){
-  renderSetup();
-  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
-  $('toRule').onclick=()=>go('rule');
-  $('toDesign').onclick=()=>go('design');
-  $('toReveal').onclick=startReveal;
-  $('toDebrief').onclick=()=>go('debrief');
-  $('prevDay').onclick=()=>{ stop(); step(-1); };
-  $('nextDay').onclick=()=>{ stop(); step(1); };
-  $('allDays').onclick=()=>{ stop(); S.day=MODEL.days-1; renderDay(); };
-  $('playBtn').onclick=()=>{ S.timer ? (stop(), renderDay()) : play(); };
-  $('redesign').onclick=()=>go('design');
-  $('restart').onclick=()=>{ resetPicks(); renderSetup(); go('setup'); };
-  $('printBtn').onclick=()=>{ buildPrint(); window.print(); };
-  window.addEventListener('beforeprint', buildPrint);
-  document.addEventListener('keydown',e=>{
-    if($('s-reveal').classList.contains('hidden') || e.target.tagName==='INPUT') return;
-    if(e.key==='ArrowRight'){ stop(); step(1); }
-    if(e.key==='ArrowLeft'){ stop(); step(-1); }
-    if(e.key===' '){ e.preventDefault(); S.timer ? (stop(), renderDay()) : play(); }
-  });
-  go('setup');
-  window.FrictionWars={ simulate, check, MODEL, ACTIONS, CARD_FX, EVENT_FX, SCENARIOS };
+  initTheme();
+  initStart();
+  document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.goto)));
+  bindSimTransport();
+  show('start');
+  window.FrictionWars={check, simulate, SCENARIO, MODEL, STATE};
 }
 document.addEventListener('DOMContentLoaded', boot);
 </script>
