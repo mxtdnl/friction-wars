@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Friction Wars</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --paper:#f6f4ef;
+  --white:#ffffff;
+  --ink:#1b1b1b;
+  --ink-2:#555049;
+  --rule:#d6d1c7;
+  --off:#e4e0d8;
+  --g1:#0072b2;
+  --g2:#d55e00;
+  --g3:#009e73;
+  --g4:#cc79a7;
+  --font:'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html{font-size:clamp(16px,1.45vw,30px)}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--font); line-height:1.4}
+h1,h2,h3{margin:0; line-height:1.15; font-weight:700}
+h1{font-size:2rem}
+h2{font-size:1.35rem}
+h3{font-size:1.05rem}
+p{margin:0 0 .8rem}
+button,input{font:inherit; color:inherit}
+:focus-visible{outline:3px solid var(--ink); outline-offset:3px}
+
+.page{max-width:66rem; margin:0 auto; padding:1.2rem 1.5rem 3rem}
+header.top{display:flex; justify-content:space-between; align-items:baseline; gap:1rem;
+  border-bottom:2px solid var(--ink); padding-bottom:.5rem; margin-bottom:1.6rem}
+header.top .name{font-weight:700; font-size:1.1rem}
+header.top .step{color:var(--ink-2); font-size:.85rem}
+
+.btn{background:var(--ink); color:var(--white); border:2px solid var(--ink); border-radius:4px;
+  padding:.45rem 1.1rem; cursor:pointer; font-weight:700}
+.btn:hover{background:#000}
+.btn.plain{background:var(--white); color:var(--ink)}
+.btn.plain:hover{background:var(--off)}
+.btn:disabled{opacity:.4; cursor:not-allowed}
+.actions{display:flex; gap:.8rem; justify-content:space-between; align-items:center; margin-top:1.6rem; flex-wrap:wrap}
+.actions .right{display:flex; gap:.8rem; margin-left:auto}
+
+.lead{font-size:1.1rem; max-width:44rem}
+.muted{color:var(--ink-2)}
+.small{font-size:.85rem}
+.hidden{display:none !important}
+
+/* setup */
+.setup{display:grid; grid-template-columns:1fr 1fr; gap:2rem}
+@media(max-width:760px){.setup{grid-template-columns:1fr}}
+fieldset{border:none; margin:0 0 1.2rem; padding:0}
+legend{font-weight:700; margin-bottom:.5rem}
+.choice{display:flex; gap:.6rem; align-items:flex-start; padding:.6rem .7rem; border:1px solid var(--rule);
+  background:var(--white); border-radius:4px; margin-bottom:.5rem; cursor:pointer}
+.choice input{margin-top:.3rem; width:1rem; height:1rem; accent-color:var(--ink)}
+.choice span{display:block}
+.counts{display:flex; gap:.5rem}
+.counts label{border:1px solid var(--rule); background:var(--white); border-radius:4px; padding:.3rem .9rem; cursor:pointer}
+.counts input{accent-color:var(--ink)}
+.names{display:grid; gap:.5rem}
+.names label{display:flex; align-items:center; gap:.6rem}
+.names .sw{width:.9rem; height:.9rem; border-radius:2px; flex:0 0 auto}
+.names input{flex:1; padding:.3rem .5rem; border:1px solid var(--rule); border-radius:4px; background:var(--white)}
+.notes{border-top:1px solid var(--rule); padding-top:1rem; margin-top:1rem}
+.notes ol{margin:.3rem 0 0; padding-left:1.3rem}
+.notes li{margin-bottom:.3rem}
+
+/* effort bars on the rule screen */
+.choicepoint{background:var(--white); border:1px solid var(--rule); border-radius:4px; padding:1rem 1.2rem; margin-bottom:1rem}
+.choicepoint .when{font-weight:700; margin-bottom:.6rem}
+.bar-row{display:grid; grid-template-columns:14rem 1fr; gap:.8rem; align-items:center; margin-bottom:.45rem}
+@media(max-width:760px){.bar-row{grid-template-columns:1fr}}
+.bar{height:1.1rem; background:var(--off); border-radius:2px}
+.bar i{display:block; height:100%; background:var(--ink-2); border-radius:2px}
+.bar-row.wins .bar i{background:var(--ink)}
+.bar-row.wins .lab{font-weight:700}
+.gapline{margin-top:.5rem; color:var(--ink-2)}
+
+/* calendars */
+.cal{display:grid; grid-template-columns:9rem repeat(14,1fr); gap:3px; align-items:center}
+.cal .rl{font-size:.8rem; padding-right:.4rem}
+.cal .c{aspect-ratio:1; border:1px solid var(--rule); background:var(--white); border-radius:2px}
+.cal .c.no{background:var(--off); border-color:var(--off)}
+.cal .dn{font-size:.62rem; text-align:center; color:var(--ink-2)}
+.big-result{font-size:1.4rem; font-weight:700; margin:1rem 0 .4rem}
+
+/* design matrix */
+table.matrix{width:100%; border-collapse:collapse; background:var(--white); border:1px solid var(--rule)}
+.matrix th,.matrix td{padding:.45rem .6rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:middle}
+.matrix thead th{border-bottom:2px solid var(--ink); font-size:.9rem}
+.matrix td.cost{white-space:nowrap; color:var(--ink-2); width:4rem}
+.matrix td.tick,.matrix th.tick{text-align:center; width:8rem}
+.matrix input[type=checkbox]{width:1.15rem; height:1.15rem; accent-color:var(--ink); cursor:pointer}
+.matrix input[type=checkbox]:disabled{cursor:not-allowed}
+.matrix input[type=number]{width:4rem; padding:.2rem .3rem; border:1px solid var(--rule); border-radius:4px; text-align:center}
+.matrix tr.sum td{font-weight:700; border-top:2px solid var(--ink)}
+.matrix tr.pred td{background:var(--paper)}
+.matrix .over{color:var(--g2)}
+.th-team{display:inline-flex; align-items:center; gap:.4rem}
+.th-team .sw{width:.8rem; height:.8rem; border-radius:2px}
+
+/* reveal */
+.dayhead{display:flex; justify-content:space-between; align-items:baseline; gap:1rem; flex-wrap:wrap; margin-bottom:.4rem}
+.dayhead h2{font-size:1.5rem}
+.events{min-height:2.6rem; margin-bottom:1rem; color:var(--ink-2)}
+.events div{margin-bottom:.15rem}
+.teams{display:grid; grid-template-columns:repeat(2,1fr); gap:1.2rem}
+.teams.one{grid-template-columns:1fr}
+@media(max-width:900px){.teams{grid-template-columns:1fr}}
+.team{background:var(--white); border:1px solid var(--rule); border-radius:4px; padding:.9rem 1rem}
+.team h3{display:flex; align-items:center; gap:.5rem; margin-bottom:.6rem}
+.team h3 .sw{width:.9rem; height:.9rem; border-radius:2px}
+.team .tally{font-size:.85rem; margin-top:.5rem}
+.team .tally b{font-size:1rem}
+.team .log{font-size:.8rem; margin-top:.5rem; min-height:1.2rem}
+.team .log div{margin-bottom:.15rem}
+.gap svg{display:block; width:100%; height:auto; margin-top:.6rem}
+.controls{display:flex; gap:.6rem; align-items:center; flex-wrap:wrap}
+
+/* debrief */
+section.block{margin-top:2rem}
+section.block > h2{margin-bottom:.7rem}
+table.cards{width:100%; border-collapse:collapse; background:var(--white); border:1px solid var(--rule)}
+.cards th,.cards td{padding:.5rem .6rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top}
+.cards thead th{border-bottom:2px solid var(--ink); font-size:.9rem}
+.cards td.kind{font-size:.85rem; color:var(--ink-2); width:11rem}
+.dots{display:flex; flex-direction:column; gap:.2rem; font-size:.85rem}
+.by{display:inline-flex; align-items:center; gap:.35rem; white-space:nowrap}
+.dot{width:.85rem; height:.85rem; border-radius:2px; display:inline-block}
+.slider-wrap{background:var(--white); border:1px solid var(--rule); border-radius:4px; padding:1rem 1.2rem}
+.slider-wrap input[type=range]{width:100%; accent-color:var(--ink)}
+.slider-read{display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap; font-weight:700; margin:.4rem 0 .8rem}
+.questions ol{padding-left:1.3rem; margin:0}
+.questions li{margin-bottom:.7rem; max-width:48rem}
+details{background:var(--white); border:1px solid var(--rule); border-radius:4px; padding:.7rem 1rem}
+details summary{cursor:pointer; font-weight:700}
+details p,details li{font-size:.9rem}
+
+/* print: cards and prediction sheets only */
+#print{display:none}
+@media print{
+  @page{size:A4; margin:12mm}
+  html{font-size:12pt}
+  body{background:#fff}
+  .page{display:none}
+  #print{display:block}
+  .pcards{display:grid; grid-template-columns:1fr 1fr; gap:0}
+  .pcard{height:62mm; border:1px dashed #999; padding:6mm; display:flex; flex-direction:column; justify-content:space-between; break-inside:avoid}
+  .pcard .t{font-size:15pt; font-weight:700; line-height:1.2}
+  .pcard .k{font-size:11pt; color:#444}
+  .pcard .cost{align-self:flex-end; font-size:20pt; font-weight:700}
+  .psheet{break-before:page}
+  .psheet h2{font-size:18pt; margin-bottom:6mm}
+  .psheet p{font-size:12pt}
+  .psheet .line{border-bottom:1px solid #000; height:12mm; margin-bottom:4mm}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <span class="name">Friction Wars</span>
+    <span class="step" id="stepLabel"></span>
+  </header>
+
+  <!-- 1. Set up -->
+  <section id="s-setup">
+    <h1>Friction Wars</h1>
+    <p class="lead" style="margin-top:.6rem">A 30-minute exercise on why people do what is easiest at the moment of choice, and what that means for any change you ask of an organisation.</p>
+    <div class="setup" style="margin-top:1.4rem">
+      <div>
+        <fieldset>
+          <legend>Scenario</legend>
+          <div id="scenarioList"></div>
+        </fieldset>
+        <fieldset>
+          <legend>Number of tables</legend>
+          <div class="counts" id="countList"></div>
+        </fieldset>
+        <fieldset>
+          <legend>Table names</legend>
+          <div class="names" id="nameList"></div>
+        </fieldset>
+      </div>
+      <div class="notes small">
+        <b>Facilitator notes</b>
+        <ol>
+          <li><b>The rule, 5 minutes.</b> Show the two choices and ask the room to predict the fortnight with nothing changed.</li>
+          <li><b>Design, 10 minutes.</b> Each table gets the eight printed cards and 10 points. They choose cards and write down two predictions. Enter both here.</li>
+          <li><b>The fortnight, 5 minutes.</b> Play the 14 days. Pause on the days marked with a note.</li>
+          <li><b>Debrief, 10 minutes.</b> Show what each card did, then use the slider to show how little separates no change from complete change. Finish with the questions.</li>
+        </ol>
+        <p style="margin-top:.8rem">Print the cards and prediction sheets before the session. The card backs are not printed; their effects are shown in the debrief.</p>
+        <button class="btn plain" id="printBtn">Print cards and sheets</button>
+      </div>
+    </div>
+    <div class="actions"><div class="right"><button class="btn" id="toRule">Start</button></div></div>
+  </section>
+
+  <!-- 2. The rule -->
+  <section id="s-rule" class="hidden">
+    <h1 id="ruleTitle"></h1>
+    <p class="lead" id="ruleIntro" style="margin-top:.6rem"></p>
+    <div id="ruleChoices" style="margin-top:1.2rem"></div>
+    <div class="choicepoint">
+      <p style="font-weight:700; margin-bottom:.4rem" id="ruleQuestion"></p>
+      <button class="btn plain" id="ruleRun">Show the fortnight</button>
+      <div id="ruleResult" class="hidden" style="margin-top:1rem"></div>
+    </div>
+    <div class="actions">
+      <button class="btn plain" data-go="setup">Back</button>
+      <div class="right"><button class="btn" id="toDesign">Next: design</button></div>
+    </div>
+  </section>
+
+  <!-- 3. Design -->
+  <section id="s-design" class="hidden">
+    <h1>Spend 10 points on the environment</h1>
+    <p class="lead" style="margin-top:.6rem" id="designIntro"></p>
+    <table class="matrix" id="matrix"></table>
+    <p class="small muted" style="margin-top:.6rem">A card that cannot be afforded is greyed out. Predictions are optional.</p>
+    <div class="actions">
+      <button class="btn plain" data-go="rule">Back</button>
+      <div class="right"><button class="btn" id="toReveal">Run the fortnight</button></div>
+    </div>
+  </section>
+
+  <!-- 4. The fortnight -->
+  <section id="s-reveal" class="hidden">
+    <div class="dayhead">
+      <h2 id="dayTitle"></h2>
+      <div class="controls">
+        <button class="btn plain" id="prevDay" aria-label="Previous day">Previous</button>
+        <button class="btn" id="playBtn">Play</button>
+        <button class="btn plain" id="nextDay" aria-label="Next day">Next day</button>
+        <button class="btn plain" id="allDays">Show all 14 days</button>
+      </div>
+    </div>
+    <div class="events" id="events" aria-live="polite"></div>
+    <div class="teams" id="teams"></div>
+    <p class="small muted" style="margin-top:.8rem" id="gapKey"></p>
+    <div class="actions">
+      <button class="btn plain" data-go="design">Back to design</button>
+      <div class="right"><button class="btn" id="toDebrief">Next: debrief</button></div>
+    </div>
+  </section>
+
+  <!-- 5. Debrief -->
+  <section id="s-debrief" class="hidden">
+    <h1>What happened</h1>
+
+    <section class="block">
+      <h2>What each card did</h2>
+      <table class="cards" id="cardTable"></table>
+    </section>
+
+    <section class="block">
+      <h2 id="sliderTitle"></h2>
+      <p class="lead" id="sliderIntro"></p>
+      <div class="slider-wrap">
+        <label for="slider" class="small muted" id="sliderLabel"></label>
+        <input type="range" id="slider" min="0" max="6" step="0.25" value="0">
+        <div class="slider-read"><span id="sliderX"></span><span id="sliderY"></span></div>
+        <div id="sliderCal"></div>
+        <div id="sliderChart" class="gap"></div>
+      </div>
+      <p style="margin-top:.8rem" id="sliderFinding"></p>
+    </section>
+
+    <section class="block questions">
+      <h2>Questions for the room</h2>
+      <ol id="questions"></ol>
+    </section>
+
+    <section class="block">
+      <details>
+        <summary>How the model works</summary>
+        <p style="margin-top:.6rem">At each choice, the effort of an option is its starting effort, plus or minus the cards that act on it, minus the strength of the habit, minus the pull of the time of day, plus any event on that day. The person takes the option with the lower effort. There is no randomness, so every table faces the same fortnight and every difference between tables comes from the cards.</p>
+        <p>Each time an option is chosen its habit grows, faster if it is rewarding. When it is not chosen, its habit fades a little. A second card on the same option counts for 72% of its face value and a third for 52%.</p>
+        <p>The numbers are set for teaching. They are not measurements.</p>
+      </details>
+    </section>
+
+    <div class="actions">
+      <button class="btn plain" data-go="reveal">Back</button>
+      <div class="right">
+        <button class="btn plain" id="redesign">Change the designs and run again</button>
+        <button class="btn" id="restart">New session</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="print"></div>
+
+<script>
+"use strict";
+
+/* Model settings. Calibrate with FrictionWars.check() in the console. */
+const MODEL = { kHabit:6, learn:0.35, decay:0.92, stack:0.72, days:14, budget:10 };
+const DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const COLOURS = ['var(--g1)','var(--g2)','var(--g3)','var(--g4)'];
+
+/* Both scenarios share the same numbers, so they behave identically. */
+const ACTIONS = {
+  amGood:{ base:6,   reward:0.45, init:0.05, drive:1.5 },
+  amBad: { base:2,   reward:0.10, init:0.25, drive:0.5 },
+  pmBad: { base:2.5, reward:0.40, init:0.50, drive:1.5 },
+  pmGood:{ base:3,   reward:0.40, init:0.10, drive:0   },
+};
+const CARD_FX = {
+  c1:{ cost:2, fx:[['amGood',-3]] },
+  c2:{ cost:2, fx:[['amGood',-2.5]] },
+  c3:{ cost:1, fx:[['amGood',-1.5]] },
+  c4:{ cost:3, fx:[['amGood',-2],['amBad',2]] },
+  c5:{ cost:3, fx:[['pmBad',3.5]] },
+  c6:{ cost:2, fx:[['pmBad',2.5]] },
+  c7:{ cost:2, fx:[], reward:['amGood',2] },
+  c8:{ cost:1, fx:[] },
+};
+const EVENT_FX = [
+  { day:2,  slot:'am', action:'amGood', mod:1.5, key:'hardAm1' },
+  { day:2,  slot:'pm', action:'pmBad',  mod:4,   key:'away1' },
+  { day:3,  slot:'pm', action:'pmBad',  mod:4,   key:'away2' },
+  { day:5,  slot:'am', action:'amGood', mod:-1.5, key:'weekend' },
+  { day:6,  slot:'am', action:'amGood', mod:-1.5, key:'weekend' },
+  { day:8,  slot:'am', action:'amGood', mod:2,   key:'hardAm2' },
+  { day:9,  slot:'pm', action:'pmBad',  mod:-1.5, key:'hardPm' },
+  { day:12, slot:'am', action:'amGood', mod:-1.5, key:'weekend' },
+  { day:13, slot:'am', action:'amGood', mod:-1.5, key:'weekend' },
+];
+
+const SCENARIOS = {
+  sam:{
+    id:'sam', title:'Sam and the strategy paper',
+    summary:'A divisional head trying to do strategy work first thing and to stop reading email in bed.',
+    person:'Sam',
+    intro:'Sam runs a division and has been asked by the board for a strategy paper. Sam wants to spend the first hour of each day on it, and to stop reading email in bed. At 08:00 Sam chooses between the paper and the inbox. At 22:30 Sam chooses between email and a book. Each time, Sam takes the option that needs less effort at that moment.',
+    am:{ time:'08:00', good:'Work on the strategy paper', bad:'Open the inbox',
+         goodPhrase:'working on the strategy paper', badPhrase:'opening the inbox', row:'Strategy first' },
+    pm:{ time:'22:30', good:'Read a book, then sleep', bad:'Read email in bed',
+         goodPhrase:'reading a book', badPhrase:'reading email in bed', row:'No email in bed' },
+    question:'If nothing around Sam changes, on how many of the next 14 mornings will Sam start with the strategy paper?',
+    after:(am,pm)=>`Strategy first on ${am} of 14 mornings. Email in bed on ${14-pm} of 14 nights. Sam wants both changes, and wanting them does not shorten either bar.`,
+    designIntro:'Each table chooses cards for Sam\'s environment. Cards cost 1 to 3 points. Before running, each table writes down how many mornings Sam will start with the strategy paper and how many nights Sam will stay off email.',
+    events:{
+      hardAm1:'Board papers are due. Starting the strategy work is harder this morning.',
+      away1:'Leadership offsite. Phones are collected at dinner.',
+      away2:'Second night of the offsite.',
+      weekend:'Weekend. No meetings.',
+      hardAm2:'An overnight problem in one region. Starting the strategy work is harder this morning.',
+      hardPm:'Quarterly results day. The pull to check email tonight is stronger.',
+    },
+    cards:{
+      c1:{ name:'Leave the strategy document open on your desk overnight', kind:'Makes the strategy work easier', back:'Starting the paper takes 3 points less effort. There is nothing to find or open.' },
+      c2:{ name:'Write the first sentence of tomorrow\'s section before you leave', kind:'Makes the strategy work easier', back:'Starting the paper takes 2.5 points less effort. The blank page is gone.' },
+      c3:{ name:'Clear your desk before you leave', kind:'Makes the strategy work easier', back:'Starting the paper takes 1.5 points less effort.' },
+      c4:{ name:'Hold the hour with your deputy, who arrives at 08:00 with notes', kind:'Easier strategy work and a harder inbox', back:'Starting the paper takes 2 points less effort and opening the inbox takes 2 points more. Someone is waiting.' },
+      c5:{ name:'Remove work email from your personal phone', kind:'Makes email in bed harder', back:'Email in bed takes 3.5 points more effort. It needs the laptop.' },
+      c6:{ name:'Charge the phone in the kitchen overnight', kind:'Makes email in bed harder', back:'Email in bed takes 2.5 points more effort.' },
+      c7:{ name:'Tell your chief of staff each morning what you wrote', kind:'Rewards the strategy work afterwards', back:'Each morning of strategy work builds the habit twice as fast. It does nothing until Sam does the first one.' },
+      c8:{ name:'Make "strategy first" your objective for the quarter', kind:'No change at the moment of choice', back:'At 08:00 and 22:30 both options take exactly the same effort as before.' },
+    },
+    questions:[
+      'Name one behaviour your organisation needs more of this year. At the moment someone chooses, which option takes less effort?',
+      'Look at the programmes you are running to get that behaviour. Which of them change the steps people have to take, and which change how people feel about it?',
+      'Sam\'s evening habit changed after two nights at an offsite. Which disruptions coming up in your organisation, such as an office move, a restructure or a new system, could reset a habit in the same way?',
+      'On the slider, a fraction of a point separated no change from a complete change. Which of your initiatives might be stalled just short of that point?',
+    ],
+  },
+  ada:{
+    id:'ada', title:'Ada and the morning run',
+    summary:'A personal example: running before work and stopping late-night snacks.',
+    person:'Ada',
+    intro:'Ada wants to run before work and to stop eating late at night. At 07:00 she chooses between a run and the snooze button. At 22:30 she chooses between a snack and making tea and going to bed. Each time, she takes the option that needs less effort at that moment.',
+    am:{ time:'07:00', good:'Go for a run', bad:'Hit snooze',
+         goodPhrase:'going for a run', badPhrase:'hitting snooze', row:'Ran' },
+    pm:{ time:'22:30', good:'Make tea and go to bed', bad:'Eat a late snack',
+         goodPhrase:'making tea and going to bed', badPhrase:'eating a late snack', row:'No late snack' },
+    question:'If nothing around Ada changes, on how many of the next 14 mornings will she run?',
+    after:(am,pm)=>`Ran on ${am} of 14 mornings. A late snack on ${14-pm} of 14 nights. Ada wants both changes, and wanting them does not shorten either bar.`,
+    designIntro:'Each table chooses cards for Ada\'s environment. Cards cost 1 to 3 points. Before running, each table writes down how many mornings Ada will run and how many nights she will go to bed without a snack.',
+    events:{
+      hardAm1:'Rain. Running is harder this morning.',
+      away1:'Ada stays at her sister\'s. There are no snacks in the house.',
+      away2:'Second night at her sister\'s.',
+      weekend:'Weekend. No work, more time.',
+      hardAm2:'Heavy rain. Running is harder this morning.',
+      hardPm:'A bad day at work. The pull to snack is stronger tonight.',
+    },
+    cards:{
+      c1:{ name:'Lay out your running kit the night before', kind:'Makes running easier', back:'Running takes 3 points less effort. Fewer steps between waking and running.' },
+      c2:{ name:'Sleep in your running clothes', kind:'Makes running easier', back:'Running takes 2.5 points less effort.' },
+      c3:{ name:'Put your shoes by the front door', kind:'Makes running easier', back:'Running takes 1.5 points less effort.' },
+      c4:{ name:'Arrange to run with a friend at 07:00', kind:'Easier run and a harder snooze', back:'Running takes 2 points less effort and snoozing takes 2 points more. Someone is waiting.' },
+      c5:{ name:'Don\'t buy snacks on the weekly shop', kind:'Makes snacking harder', back:'A late snack takes 3.5 points more effort. The cupboard is empty.' },
+      c6:{ name:'Keep snacks in a closed tin on the top shelf', kind:'Makes snacking harder', back:'A late snack takes 2.5 points more effort.' },
+      c7:{ name:'Treat yourself to a good coffee after every run', kind:'Rewards running afterwards', back:'Each run builds the habit twice as fast. It does nothing until Ada goes on the first one.' },
+      c8:{ name:'Write a fitness goal on the fridge', kind:'No change at the moment of choice', back:'At 07:00 and 22:30 both options take exactly the same effort as before.' },
+    },
+    questions:[
+      'Name one behaviour your organisation needs more of this year. At the moment someone chooses, which option takes less effort?',
+      'Look at the programmes you are running to get that behaviour. Which of them change the steps people have to take, and which change how people feel about it?',
+      'Ada\'s evening habit changed after two nights at her sister\'s. Which disruptions coming up in your organisation, such as an office move, a restructure or a new system, could reset a habit in the same way?',
+      'On the slider, a fraction of a point separated no change from a complete change. Which of your initiatives might be stalled just short of that point?',
+    ],
+  },
+};
+const CARD_IDS = Object.keys(CARD_FX);
+
+/* ---------- engine ---------- */
+function combine(mods){
+  return mods.slice().sort((a,b)=>Math.abs(b)-Math.abs(a))
+    .reduce((t,m,i)=>t+m*Math.pow(MODEL.stack,i),0);
+}
+function simulate(picks, extra){
+  const lists={};
+  const add=(a,m)=>{ (lists[a]=lists[a]||[]).push(m); };
+  const reward={};
+  for(const a in ACTIONS) reward[a]=ACTIONS[a].reward;
+  picks.forEach(id=>{
+    const c=CARD_FX[id];
+    c.fx.forEach(([a,m])=>add(a,m));
+    if(c.reward) reward[c.reward[0]]*=c.reward[1];
+  });
+  (extra||[]).forEach(([a,m])=>add(a,m));
+  const card={};
+  for(const a in lists) card[a]=combine(lists[a]);
+
+  const habit={};
+  for(const a in ACTIONS) habit[a]=ACTIONS[a].init;
+  const out={am:[],pm:[]};
+  for(let d=0; d<MODEL.days; d++){
+    for(const slot of ['am','pm']){
+      const good=slot+'Good', bad=slot+'Bad';
+      const eff={};
+      for(const a of [good,bad]){
+        const A=ACTIONS[a];
+        const ev=EVENT_FX.filter(e=>e.day===d && e.slot===slot && e.action===a).reduce((t,e)=>t+e.mod,0);
+        eff[a]=A.base+(card[a]||0)-MODEL.kHabit*habit[a]-A.drive+ev;
+      }
+      const didGood = eff[good] < eff[bad];
+      const chosen = didGood?good:bad, other = didGood?bad:good;
+      habit[chosen] += MODEL.learn*reward[chosen]*(1-habit[chosen]);
+      habit[other]  *= MODEL.decay;
+      out[slot].push({ good:didGood, gap:eff[good]-eff[bad], effGood:eff[good], effBad:eff[bad] });
+    }
+  }
+  out.amCount=out.am.filter(x=>x.good).length;
+  out.pmCount=out.pm.filter(x=>x.good).length;
+  return out;
+}
+
+/* ---------- state ---------- */
+const S = {
+  scenario:'sam',
+  count:2,
+  names:['Table 1','Table 2','Table 3','Table 4'],
+  picks:[[],[],[],[]],
+  preds:[{},{},{},{}],
+  runs:null,
+  day:-1,
+  timer:null,
+};
+const scn=()=>SCENARIOS[S.scenario];
+const tables=()=>Array.from({length:S.count},(_,i)=>i);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const fmt=x=>(Math.round(x*10)/10).toString();
+const fmtQ=x=>(Math.round(x*4)/4).toString();
+const $=id=>document.getElementById(id);
+
+/* ---------- navigation ---------- */
+const STEPS=['setup','rule','design','reveal','debrief'];
+const STEP_NAMES={setup:'Set up',rule:'The rule',design:'Design',reveal:'The fortnight',debrief:'Debrief'};
+function go(step){
+  stop();
+  STEPS.forEach(s=>$('s-'+s).classList.toggle('hidden', s!==step));
+  $('stepLabel').textContent = step==='setup' ? '' : `Step ${STEPS.indexOf(step)} of 4: ${STEP_NAMES[step]}`;
+  if(step==='rule') enterRule();
+  if(step==='design') enterDesign();
+  if(step==='debrief') enterDebrief();
+  window.scrollTo(0,0);
+}
+
+/* ---------- 1. set up ---------- */
+function renderSetup(){
+  $('scenarioList').innerHTML = Object.values(SCENARIOS).map(s=>`
+    <label class="choice"><input type="radio" name="scn" value="${s.id}" ${s.id===S.scenario?'checked':''}>
+      <span><b>${esc(s.title)}</b><span class="small muted">${esc(s.summary)}</span></span></label>`).join('');
+  $('countList').innerHTML = [1,2,3,4].map(n=>`
+    <label><input type="radio" name="cnt" value="${n}" ${n===S.count?'checked':''}> ${n}</label>`).join('');
+  $('nameList').innerHTML = tables().map(i=>`
+    <label><span class="sw" style="background:${COLOURS[i]}"></span>
+      <input type="text" value="${esc(S.names[i])}" data-i="${i}" aria-label="Name of table ${i+1}" maxlength="24"></label>`).join('');
+  document.querySelectorAll('input[name=scn]').forEach(r=>r.onchange=()=>{ S.scenario=r.value; resetPicks(); });
+  document.querySelectorAll('input[name=cnt]').forEach(r=>r.onchange=()=>{ S.count=+r.value; renderSetup(); });
+  document.querySelectorAll('#nameList input').forEach(inp=>inp.oninput=()=>{ S.names[+inp.dataset.i]=inp.value.trim()||`Table ${+inp.dataset.i+1}`; });
+}
+function resetPicks(){ S.picks=[[],[],[],[]]; S.preds=[{},{},{},{}]; S.runs=null; }
+
+/* ---------- 2. the rule ---------- */
+function barsHtml(slotKey, step){
+  const s=scn(), slot=s[slotKey];
+  const good=step.effGood, bad=step.effBad;
+  const max=Math.max(good,bad)+5;
+  const w=v=>Math.max(4,(v+5)/max*100);
+  const goodWins=good<bad;
+  const harder = good>bad ? `${cap(slot.goodPhrase)} takes ${fmt(good-bad)} more effort points than ${slot.badPhrase}.`
+                          : `${cap(slot.goodPhrase)} takes ${fmt(bad-good)} fewer effort points than ${slot.badPhrase}.`;
+  return `<div class="choicepoint">
+    <div class="when">${slot.time}</div>
+    <div class="bar-row ${goodWins?'wins':''}"><span class="lab">${esc(slot.good)}</span><div class="bar"><i style="width:${w(good)}%"></i></div></div>
+    <div class="bar-row ${goodWins?'':'wins'}"><span class="lab">${esc(slot.bad)}</span><div class="bar"><i style="width:${w(bad)}%"></i></div></div>
+    <div class="gapline">${harder} ${esc(s.person)} takes the shorter bar: ${esc((goodWins?slot.good:slot.bad).toLowerCase())}.</div>
+  </div>`;
+}
+function enterRule(){
+  const s=scn(), base=simulate([]);
+  $('ruleTitle').textContent=`${s.person} does whatever takes less effort.`;
+  $('ruleIntro').textContent=s.intro;
+  $('ruleChoices').innerHTML=barsHtml('am',base.am[0])+barsHtml('pm',base.pm[0]);
+  $('ruleQuestion').textContent=s.question;
+  $('ruleResult').classList.add('hidden');
+  $('ruleRun').classList.remove('hidden');
+  $('ruleRun').onclick=()=>{
+    $('ruleResult').innerHTML = calHtml(base, MODEL.days, 'var(--ink)') +
+      `<p class="big-result">${esc(s.after(base.amCount, base.pmCount))}</p>`;
+    $('ruleResult').classList.remove('hidden');
+    $('ruleRun').classList.add('hidden');
+  };
+}
+function calHtml(run, upto, colour, slots){
+  const s=scn();
+  slots=slots||['am','pm'];
+  const label=slots.map(k=>`${s[k].row}: ${countTo(run[k],upto)} of ${upto}.`).join(' ');
+  let h='<div class="cal" role="img" aria-label="'+esc(label)+'"><span></span>';
+  for(let d=0; d<MODEL.days; d++) h+=`<span class="dn">${d+1}</span>`;
+  for(const slot of slots){
+    h+=`<span class="rl">${esc(s[slot].row)}</span>`;
+    for(let d=0; d<MODEL.days; d++){
+      if(d>=upto){ h+='<span class="c"></span>'; continue; }
+      h+= run[slot][d].good ? `<span class="c" style="background:${colour};border-color:${colour}"></span>` : '<span class="c no"></span>';
+    }
+  }
+  return h+'</div>';
+}
+const countTo=(arr,upto)=>arr.slice(0,upto).filter(x=>x.good).length;
+
+/* ---------- 3. design ---------- */
+function spent(i){ return S.picks[i].reduce((t,id)=>t+CARD_FX[id].cost,0); }
+function enterDesign(){
+  const s=scn();
+  $('designIntro').textContent=s.designIntro;
+  renderMatrix();
+}
+function renderMatrix(){
+  const s=scn(), T=tables();
+  let h='<thead><tr><th>Card</th><th>Cost</th>'+T.map(i=>`<th class="tick"><span class="th-team"><span class="sw" style="background:${COLOURS[i]}"></span>${esc(S.names[i])}</span></th>`).join('')+'</tr></thead><tbody>';
+  CARD_IDS.forEach(id=>{
+    h+=`<tr><td>${esc(s.cards[id].name)}</td><td class="cost">${CARD_FX[id].cost} pt</td>`;
+    T.forEach(i=>{
+      const on=S.picks[i].includes(id);
+      const can=on || spent(i)+CARD_FX[id].cost<=MODEL.budget;
+      h+=`<td class="tick"><input type="checkbox" data-t="${i}" data-c="${id}" ${on?'checked':''} ${can?'':'disabled'} aria-label="${esc(S.names[i]+': '+s.cards[id].name)}"></td>`;
+    });
+    h+='</tr>';
+  });
+  h+='<tr class="sum"><td>Points left</td><td></td>'+T.map(i=>`<td class="tick">${MODEL.budget-spent(i)} of ${MODEL.budget}</td>`).join('')+'</tr>';
+  h+=`<tr class="pred"><td>Prediction: ${esc(s.am.row.toLowerCase())}, out of 14</td><td></td>`+T.map(i=>`<td class="tick"><input type="number" min="0" max="14" data-t="${i}" data-p="am" value="${S.preds[i].am??''}" aria-label="${esc(S.names[i])} prediction, mornings"></td>`).join('')+'</tr>';
+  h+=`<tr class="pred"><td>Prediction: ${esc(s.pm.row.toLowerCase())}, out of 14</td><td></td>`+T.map(i=>`<td class="tick"><input type="number" min="0" max="14" data-t="${i}" data-p="pm" value="${S.preds[i].pm??''}" aria-label="${esc(S.names[i])} prediction, evenings"></td>`).join('')+'</tr>';
+  h+='</tbody>';
+  $('matrix').innerHTML=h;
+  $('matrix').querySelectorAll('input[type=checkbox]').forEach(cb=>cb.onchange=()=>{
+    const i=+cb.dataset.t, id=cb.dataset.c, p=S.picks[i];
+    if(cb.checked){ if(!p.includes(id)) p.push(id); } else { p.splice(p.indexOf(id),1); }
+    renderMatrix();
+    const again=$('matrix').querySelector(`input[data-t="${i}"][data-c="${id}"]`); if(again) again.focus();
+  });
+  $('matrix').querySelectorAll('input[type=number]').forEach(inp=>inp.oninput=()=>{
+    const v=inp.value===''?undefined:Math.max(0,Math.min(14,Math.round(+inp.value)));
+    S.preds[+inp.dataset.t][inp.dataset.p]=v;
+  });
+}
+
+/* ---------- 4. the fortnight ---------- */
+function startReveal(){
+  S.runs=tables().map(i=>simulate(S.picks[i]));
+  S.day=-1;
+  const s=scn();
+  $('teams').className='teams'+(S.count===1?' one':'');
+  $('teams').innerHTML=tables().map(i=>`
+    <div class="team">
+      <h3><span class="sw" style="background:${COLOURS[i]}"></span>${esc(S.names[i])}</h3>
+      <div id="cal-${i}"></div>
+      <div class="gap" id="gap-${i}"></div>
+      <div class="tally" id="tally-${i}"></div>
+      <div class="log" id="log-${i}"></div>
+    </div>`).join('');
+  $('gapKey').textContent=`The chart shows how much more effort the intended option takes than the old one. Solid line: ${s.am.time}. Dashed line: ${s.pm.time}. Below the middle line, ${s.person} does the intended thing.`;
+  go('reveal');
+  renderDay();
+  play();
+}
+function renderDay(){
+  const s=scn(), upto=S.day+1;
+  $('dayTitle').textContent = S.day<0 ? 'Before day 1' : `Day ${upto} of 14 · ${DAY_NAMES[S.day%7]}`;
+  const ev = S.day<0 ? [] : EVENT_FX.filter(e=>e.day===S.day).map(e=>s.events[e.key]);
+  $('events').innerHTML = ev.map(t=>`<div>${esc(t)}</div>`).join('');
+  tables().forEach(i=>{
+    const r=S.runs[i];
+    $('cal-'+i).innerHTML=calHtml(r, upto, COLOURS[i]);
+    $('gap-'+i).innerHTML=gapChart(r, upto, COLOURS[i]);
+    const am=countTo(r.am,upto), pm=countTo(r.pm,upto);
+    const pr=S.preds[i];
+    const done = upto===MODEL.days;
+    $('tally-'+i).innerHTML = `${esc(s.am.row)}: <b>${am}</b> of ${upto}`+(done&&pr.am!==undefined?` <span class="muted">(predicted ${pr.am})</span>`:'')+
+      ` &nbsp; ${esc(s.pm.row)}: <b>${pm}</b> of ${upto}`+(done&&pr.pm!==undefined?` <span class="muted">(predicted ${pr.pm})</span>`:'');
+    $('log-'+i).innerHTML = switchNotes(r, upto).map(t=>`<div>${esc(t)}</div>`).join('');
+  });
+  $('playBtn').textContent = S.timer ? 'Pause' : 'Play';
+}
+function switchNotes(r, upto){
+  const s=scn(), notes=[];
+  for(const slot of ['am','pm']){
+    const sl=s[slot];
+    for(let d=0; d<upto; d++){
+      const prev = d===0 ? false : r[slot][d-1].good;
+      const now = r[slot][d].good;
+      if(now && !prev) notes.push({d, t: d===0 ? `From day 1, ${sl.goodPhrase} is easier than ${sl.badPhrase}.`
+                                              : `Day ${d+1}: ${sl.goodPhrase} became easier than ${sl.badPhrase}.`});
+      if(!now && prev) notes.push({d, t:`Day ${d+1}: ${sl.badPhrase} was easier again.`});
+    }
+  }
+  return notes.sort((a,b)=>a.d-b.d).map(n=>cap(n.t));
+}
+function gapChart(r, upto, colour){
+  const W=600, H=230, L=40, R=110, Tp=12, B=26;
+  const lo=-9, hi=9;
+  const x=d=>L+(W-L-R)*d/(MODEL.days-1);
+  const y=v=>Tp+(H-Tp-B)*(hi-Math.max(lo,Math.min(hi,v)))/(hi-lo);
+  let g=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Effort gap by day">`;
+  g+=`<rect x="${L}" y="${y(0)}" width="${W-L-R}" height="${y(lo)-y(0)}" fill="#f1efe9"/>`;
+  g+=`<line x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}" stroke="#1b1b1b" stroke-width="1.5"/>`;
+  g+=`<text x="${W-R+10}" y="${y(0)-30}" font-size="14" fill="#555049"><tspan x="${W-R+10}">Old habit</tspan><tspan x="${W-R+10}" dy="16">wins</tspan></text>`;
+  g+=`<text x="${W-R+10}" y="${y(0)+24}" font-size="14" fill="#555049"><tspan x="${W-R+10}">Intended</tspan><tspan x="${W-R+10}" dy="16">option wins</tspan></text>`;
+  [-6,-3,0,3,6].forEach(v=>{ g+=`<text x="${L-8}" y="${y(v)+5}" font-size="13" fill="#555049" text-anchor="end">${v>0?'+':''}${v}</text>`; });
+  [0,6,13].forEach(d=>{ g+=`<text x="${x(d)}" y="${H-6}" font-size="13" fill="#555049" text-anchor="middle">Day ${d+1}</text>`; });
+  if(upto>0){
+    for(const [slot,dash] of [['am',''],['pm','7 5']]){
+      const pts=r[slot].slice(0,upto).map((p,d)=>`${x(d)},${y(p.gap)}`).join(' ');
+      if(upto>1) g+=`<polyline points="${pts}" fill="none" stroke="${colour}" stroke-width="3" ${dash?`stroke-dasharray="${dash}"`:''}/>`;
+      r[slot].slice(0,upto).forEach((p,d)=>{ g+=`<circle cx="${x(d)}" cy="${y(p.gap)}" r="4" fill="${p.good?colour:'#ffffff'}" stroke="${colour}" stroke-width="2"/>`; });
+    }
+  }
+  return g+'</svg>';
+}
+function step(n){
+  S.day=Math.max(-1,Math.min(MODEL.days-1,S.day+n));
+  renderDay();
+}
+function play(){
+  if(S.timer) return;
+  if(S.day>=MODEL.days-1) S.day=-1;
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  S.timer=setInterval(()=>{
+    if(S.day>=MODEL.days-1){ stop(); return; }
+    step(1);
+  }, reduced?2200:1400);
+  renderDay();
+}
+function stop(){
+  if(S.timer){ clearInterval(S.timer); S.timer=null; }
+  if($('playBtn')) $('playBtn').textContent='Play';
+}
+
+/* ---------- 5. debrief ---------- */
+function enterDebrief(){
+  const s=scn();
+  let h='<thead><tr><th>Card</th><th>What it changed</th><th>Type</th><th>Bought by</th></tr></thead><tbody>';
+  CARD_IDS.forEach(id=>{
+    const c=s.cards[id];
+    const by=tables().filter(i=>S.picks[i].includes(id));
+    h+=`<tr><td><b>${esc(c.name)}</b> <span class="muted small" style="white-space:nowrap">${CARD_FX[id].cost} pt</span></td><td>${esc(c.back)}</td><td class="kind">${esc(c.kind)}</td>
+      <td><div class="dots">${by.map(i=>`<span class="by"><span class="dot" style="background:${COLOURS[i]}"></span>${esc(S.names[i])}</span>`).join('')||'<span class="muted">None</span>'}</div></td></tr>`;
+  });
+  h+='</tbody>';
+  $('cardTable').innerHTML=h;
+
+  $('sliderTitle').textContent='How much change does it take?';
+  $('sliderIntro').textContent=`No cards, the same fortnight. Drag the slider to take effort away from ${s.am.goodPhrase} and watch the mornings.`;
+  $('sliderLabel').textContent=`Effort points removed from ${s.am.goodPhrase}`;
+  const curve=[];
+  for(let v=0; v<=6.0001; v+=0.25) curve.push({v, n:simulate([],[['amGood',-v]]).amCount});
+  const lastZero=curve.filter(c=>c.n===0).pop();
+  const firstSome=curve.find(c=>c.n>0);
+  const firstAll=curve.find(c=>c.n===MODEL.days);
+  $('sliderFinding').textContent = (lastZero && firstSome)
+    ? `Removing ${fmtQ(lastZero.v)} points changes nothing: 0 mornings out of 14. Removing ${fmtQ(firstSome.v)} points gives ${firstSome.n}.`+
+      (firstAll?` Removing ${fmtQ(firstAll.v)} gives all 14. `:' ')+
+      `Once ${s.person} does it a few times, the habit makes it easier still, so a small push early in the fortnight has a large effect by the end.`
+    : '';
+  const slider=$('slider');
+  const draw=()=>{
+    const v=+slider.value, r=simulate([],[['amGood',-v]]);
+    $('sliderX').textContent=`${fmtQ(v)} points removed`;
+    $('sliderY').textContent=`${s.am.row}: ${r.amCount} of 14 mornings`;
+    $('sliderCal').innerHTML=calHtml(r, MODEL.days, 'var(--ink)', ['am']);
+    $('sliderChart').innerHTML=curveChart(curve, v);
+  };
+  slider.value=0;
+  slider.oninput=draw;
+  draw();
+  $('questions').innerHTML=s.questions.map(q=>`<li>${esc(q)}</li>`).join('');
+}
+function curveChart(curve, v){
+  const W=600, H=200, L=40, R=20, Tp=14, B=30;
+  const x=t=>L+(W-L-R)*t/6, y=n=>Tp+(H-Tp-B)*(1-n/14);
+  let g=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Mornings out of 14 against effort removed">`;
+  [0,7,14].forEach(n=>{ g+=`<line x1="${L}" x2="${W-R}" y1="${y(n)}" y2="${y(n)}" stroke="#d6d1c7"/><text x="${L-8}" y="${y(n)+5}" font-size="13" fill="#555049" text-anchor="end">${n}</text>`; });
+  [0,1,2,3,4,5,6].forEach(t=>{ g+=`<text x="${x(t)}" y="${H-8}" font-size="13" fill="#555049" text-anchor="middle">${t}</text>`; });
+  let d=''; curve.forEach((c,i)=>{ d+=(i?` H${x(c.v)} V${y(c.n)}`:`M${x(c.v)},${y(c.n)}`); });
+  g+=`<path d="${d}" fill="none" stroke="#1b1b1b" stroke-width="3"/>`;
+  const cur=curve.reduce((a,c)=>Math.abs(c.v-v)<Math.abs(a.v-v)?c:a);
+  g+=`<line x1="${x(v)}" x2="${x(v)}" y1="${Tp}" y2="${H-B}" stroke="#555049" stroke-dasharray="4 4"/>`;
+  g+=`<circle cx="${x(v)}" cy="${y(cur.n)}" r="7" fill="#1b1b1b"/>`;
+  return g+'</svg>';
+}
+
+/* ---------- print ---------- */
+function buildPrint(){
+  const s=scn();
+  let h='<div class="pcards">';
+  CARD_IDS.forEach(id=>{ h+=`<div class="pcard"><div class="t">${esc(s.cards[id].name)}</div><div class="cost">${CARD_FX[id].cost} pt</div></div>`; });
+  h+='</div>';
+  tables().forEach(i=>{
+    h+=`<div class="psheet"><h2>${esc(S.names[i])}: ${esc(s.title)}</h2>
+      <p>Budget: ${MODEL.budget} points. Write down the cards you choose.</p>
+      <div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
+      <p>Prediction. ${esc(s.am.row)}: how many of 14 mornings?</p><div class="line"></div>
+      <p>Prediction. ${esc(s.pm.row)}: how many of 14 nights?</p><div class="line"></div></div>`;
+  });
+  $('print').innerHTML=h;
+}
+
+/* ---------- check: every affordable design, for calibration ---------- */
+function check(){
+  const rows=[];
+  for(let m=0; m<1<<CARD_IDS.length; m++){
+    const p=CARD_IDS.filter((_,i)=>m>>i&1);
+    const cost=p.reduce((t,id)=>t+CARD_FX[id].cost,0);
+    if(cost>MODEL.budget) continue;
+    const r=simulate(p);
+    rows.push({cards:p.join(' '), cost, mornings:r.amCount, evenings:r.pmCount, total:r.amCount+r.pmCount});
+  }
+  rows.sort((a,b)=>b.total-a.total);
+  console.table(rows);
+  return rows;
+}
+
+/* ---------- boot ---------- */
+function boot(){
+  renderSetup();
+  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+  $('toRule').onclick=()=>go('rule');
+  $('toDesign').onclick=()=>go('design');
+  $('toReveal').onclick=startReveal;
+  $('toDebrief').onclick=()=>go('debrief');
+  $('prevDay').onclick=()=>{ stop(); step(-1); };
+  $('nextDay').onclick=()=>{ stop(); step(1); };
+  $('allDays').onclick=()=>{ stop(); S.day=MODEL.days-1; renderDay(); };
+  $('playBtn').onclick=()=>{ S.timer ? (stop(), renderDay()) : play(); };
+  $('redesign').onclick=()=>go('design');
+  $('restart').onclick=()=>{ resetPicks(); renderSetup(); go('setup'); };
+  $('printBtn').onclick=()=>{ buildPrint(); window.print(); };
+  window.addEventListener('beforeprint', buildPrint);
+  document.addEventListener('keydown',e=>{
+    if($('s-reveal').classList.contains('hidden') || e.target.tagName==='INPUT') return;
+    if(e.key==='ArrowRight'){ stop(); step(1); }
+    if(e.key==='ArrowLeft'){ stop(); step(-1); }
+    if(e.key===' '){ e.preventDefault(); S.timer ? (stop(), renderDay()) : play(); }
+  });
+  go('setup');
+  window.FrictionWars={ simulate, check, MODEL, ACTIONS, CARD_FX, EVENT_FX, SCENARIOS };
+}
+document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
