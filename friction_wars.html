@@ -175,13 +175,9 @@ details p,details li{font-size:.9rem}
   <!-- 1. Set up -->
   <section id="s-setup">
     <h1>Friction Wars</h1>
-    <p class="lead" style="margin-top:.6rem">A 30-minute exercise on why people do what is easiest at the moment of choice, and what that means for any change you ask of an organisation.</p>
+    <p class="lead" style="margin-top:.6rem">A 30-minute exercise for the HRV debrief. It shows why people do whatever takes least effort at the moment of choice, and how to set up a working week so that recovery is the easy option.</p>
     <div class="setup" style="margin-top:1.4rem">
       <div>
-        <fieldset>
-          <legend>Scenario</legend>
-          <div id="scenarioList"></div>
-        </fieldset>
         <fieldset>
           <legend>Number of tables</legend>
           <div class="counts" id="countList"></div>
@@ -197,7 +193,7 @@ details p,details li{font-size:.9rem}
           <li><b>The rule, 5 minutes.</b> Show the two choices and ask the room to predict the fortnight with nothing changed.</li>
           <li><b>Design, 10 minutes.</b> Each table gets the eight printed cards and 10 points. They choose cards and write down two predictions. Enter both here.</li>
           <li><b>The fortnight, 5 minutes.</b> Play the 14 days. Pause on the days marked with a note.</li>
-          <li><b>Debrief, 10 minutes.</b> Show what each card did, then use the slider to show how little separates no change from complete change. Finish with the questions.</li>
+          <li><b>Debrief, 10 minutes.</b> Show what each card did, then use the slider to show how little separates no change from complete change. Finish with the questions, with each person's HRV report in front of them.</li>
         </ol>
         <p style="margin-top:.8rem">Print the cards and prediction sheets before the session. The card backs are not printed; their effects are shown in the debrief.</p>
         <button class="btn plain" id="printBtn">Print cards and sheets</button>
@@ -286,7 +282,7 @@ details p,details li{font-size:.9rem}
         <summary>How the model works</summary>
         <p style="margin-top:.6rem">At each choice, the effort of an option is its starting effort, plus or minus the cards that act on it, minus the strength of the habit, minus the pull of the time of day, plus any event on that day. The person takes the option with the lower effort. There is no randomness, so every table faces the same fortnight and every difference between tables comes from the cards.</p>
         <p>Each time an option is chosen its habit grows, faster if it is rewarding. When it is not chosen, its habit fades a little. A second card on the same option counts for 72% of its face value and a third for 52%.</p>
-        <p>The numbers are set for teaching. They are not measurements.</p>
+        <p>The numbers are set for teaching. They are not measurements, and the model does not use anyone's HRV data.</p>
       </details>
     </section>
 
@@ -310,12 +306,11 @@ const MODEL = { kHabit:6, learn:0.35, decay:0.92, stack:0.72, days:14, budget:10
 const DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const COLOURS = ['var(--g1)','var(--g2)','var(--g3)','var(--g4)'];
 
-/* Both scenarios share the same numbers, so they behave identically. */
 const ACTIONS = {
   amGood:{ base:6,   reward:0.45, init:0.05, drive:1.5 },
   amBad: { base:2,   reward:0.10, init:0.25, drive:0.5 },
   pmBad: { base:2.5, reward:0.40, init:0.50, drive:1.5 },
-  pmGood:{ base:3,   reward:0.40, init:0.10, drive:0   },
+  pmGood:{ base:3,   reward:0.60, init:0.10, drive:0   },
 };
 const CARD_FX = {
   c1:{ cost:2, fx:[['amGood',-3]] },
@@ -328,90 +323,58 @@ const CARD_FX = {
   c8:{ cost:1, fx:[] },
 };
 const EVENT_FX = [
-  { day:2,  slot:'am', action:'amGood', mod:1.5, key:'hardAm1' },
-  { day:2,  slot:'pm', action:'pmBad',  mod:4,   key:'away1' },
-  { day:3,  slot:'pm', action:'pmBad',  mod:4,   key:'away2' },
-  { day:5,  slot:'am', action:'amGood', mod:-1.5, key:'weekend' },
-  { day:6,  slot:'am', action:'amGood', mod:-1.5, key:'weekend' },
-  { day:8,  slot:'am', action:'amGood', mod:2,   key:'hardAm2' },
-  { day:9,  slot:'pm', action:'pmBad',  mod:-1.5, key:'hardPm' },
-  { day:12, slot:'am', action:'amGood', mod:-1.5, key:'weekend' },
-  { day:13, slot:'am', action:'amGood', mod:-1.5, key:'weekend' },
+  { day:2,  slot:'am', action:'amGood', mod:1.5,  key:'offsiteAm' },
+  { day:3,  slot:'am', action:'amGood', mod:1.5,  key:'offsiteAm' },
+  { day:2,  slot:'pm', action:'pmBad',  mod:-1.5, key:'offsitePm' },
+  { day:3,  slot:'pm', action:'pmBad',  mod:-1.5, key:'offsitePm' },
+  { day:4,  slot:'pm', action:'pmBad',  mod:3,    key:'quietPm' },
+  { day:5,  slot:'pm', action:'pmBad',  mod:3,    key:'quietPm' },
+  { day:5,  slot:'am', action:'amGood', mod:-1.5, key:'weekendAm' },
+  { day:6,  slot:'am', action:'amGood', mod:-1.5, key:'weekendAm' },
+  { day:8,  slot:'am', action:'amGood', mod:2,    key:'crisisAm' },
+  { day:9,  slot:'pm', action:'pmBad',  mod:-1.5, key:'resultsPm' },
+  { day:11, slot:'pm', action:'pmBad',  mod:3,    key:'quietPm' },
+  { day:12, slot:'pm', action:'pmBad',  mod:3,    key:'quietPm' },
+  { day:12, slot:'am', action:'amGood', mod:-1.5, key:'weekendAm' },
+  { day:13, slot:'am', action:'amGood', mod:-1.5, key:'weekendAm' },
 ];
 
 const SCENARIOS = {
   sam:{
-    id:'sam', title:'Sam and the strategy paper',
-    summary:'A divisional head trying to do strategy work first thing and to stop reading email in bed.',
+    id:'sam', title:'Sam\'s recovery fortnight',
     person:'Sam',
-    intro:'Sam runs a division and has been asked by the board for a strategy paper. Sam wants to spend the first hour of each day on it, and to stop reading email in bed. At 08:00 Sam chooses between the paper and the inbox. At 22:30 Sam chooses between email and a book. Each time, Sam takes the option that needs less effort at that moment.',
-    am:{ time:'08:00', good:'Work on the strategy paper', bad:'Open the inbox',
-         goodPhrase:'working on the strategy paper', badPhrase:'opening the inbox', row:'Strategy first' },
-    pm:{ time:'22:30', good:'Read a book, then sleep', bad:'Read email in bed',
-         goodPhrase:'reading a book', badPhrase:'reading email in bed', row:'No email in bed' },
-    question:'If nothing around Sam changes, on how many of the next 14 mornings will Sam start with the strategy paper?',
-    after:(am,pm)=>`Strategy first on ${am} of 14 mornings. Email in bed on ${14-pm} of 14 nights. Sam wants both changes, and wanting them does not shorten either bar.`,
-    designIntro:'Each table chooses cards for Sam\'s environment. Cards cost 1 to 3 points. Before running, each table writes down how many mornings Sam will start with the strategy paper and how many nights Sam will stay off email.',
+    intro:'Sam runs a division. Sam\'s HRV report showed almost no recovery between 08:00 and 19:00, and recovery starting late at night. Sam wants two changes: a 15-minute walk outside at lunchtime, and no email in bed. At 13:00 Sam chooses between the walk and staying at the desk. At 22:30 Sam chooses between email and putting the phone down. Each time, Sam takes the option that needs less effort at that moment.',
+    am:{ time:'13:00', good:'Walk outside for 15 minutes', bad:'Eat at the desk and keep working',
+         goodPhrase:'walking outside', badPhrase:'staying at the desk', row:'Break outside', unit:'days' },
+    pm:{ time:'22:30', good:'Put the phone down, read, then sleep', bad:'Check email in bed',
+         goodPhrase:'putting the phone down', badPhrase:'checking email in bed', row:'No email in bed', unit:'nights' },
+    question:'If nothing around Sam changes, on how many of the next 14 days will Sam take the walk?',
+    after:(am,pm)=>`A break outside on ${am} of 14 days. Email in bed on ${14-pm} of 14 nights. Sam wants both changes, and wanting them does not shorten either bar.`,
+    designIntro:'Each table chooses cards for Sam\'s environment. Cards cost 1 to 3 points. Before running, each table writes down how many days Sam will take the walk and how many nights Sam will stay off email.',
     events:{
-      hardAm1:'Board papers are due. Starting the strategy work is harder this morning.',
-      away1:'Leadership offsite. Phones are collected at dinner.',
-      away2:'Second night of the offsite.',
-      weekend:'Weekend. No meetings.',
-      hardAm2:'An overnight problem in one region. Starting the strategy work is harder this morning.',
-      hardPm:'Quarterly results day. The pull to check email tonight is stronger.',
+      offsiteAm:'Leadership offsite. Sessions run straight through lunch.',
+      offsitePm:'The offsite dinner ends late and the discussion carries on over email.',
+      quietPm:'A quiet evening. Very little new email.',
+      weekendAm:'Weekend. No meetings at lunchtime.',
+      crisisAm:'A problem in one region. Back-to-back calls over lunch.',
+      resultsPm:'Quarterly results day. The pull to check email tonight is stronger.',
     },
     cards:{
-      c1:{ name:'Leave the strategy document open on your desk overnight', kind:'Makes the strategy work easier', back:'Starting the paper takes 3 points less effort. There is nothing to find or open.' },
-      c2:{ name:'Write the first sentence of tomorrow\'s section before you leave', kind:'Makes the strategy work easier', back:'Starting the paper takes 2.5 points less effort. The blank page is gone.' },
-      c3:{ name:'Clear your desk before you leave', kind:'Makes the strategy work easier', back:'Starting the paper takes 1.5 points less effort.' },
-      c4:{ name:'Hold the hour with your deputy, who arrives at 08:00 with notes', kind:'Easier strategy work and a harder inbox', back:'Starting the paper takes 2 points less effort and opening the inbox takes 2 points more. Someone is waiting.' },
+      c1:{ name:'Block 13:00 to 13:15 in your diary so no meetings land there', kind:'Makes the walk easier', back:'Walking takes 3 points less effort. There is no meeting to move first.' },
+      c2:{ name:'Keep a coat and walking shoes at the office', kind:'Makes the walk easier', back:'Walking takes 2.5 points less effort.' },
+      c3:{ name:'Pick one 15-minute route from the office door', kind:'Makes the walk easier', back:'Walking takes 1.5 points less effort. There is nothing to decide.' },
+      c4:{ name:'Agree to walk with a colleague who calls for you at 13:00', kind:'Easier walk and a harder desk lunch', back:'Walking takes 2 points less effort and staying at the desk takes 2 points more. Someone is waiting.' },
       c5:{ name:'Remove work email from your personal phone', kind:'Makes email in bed harder', back:'Email in bed takes 3.5 points more effort. It needs the laptop.' },
-      c6:{ name:'Charge the phone in the kitchen overnight', kind:'Makes email in bed harder', back:'Email in bed takes 2.5 points more effort.' },
-      c7:{ name:'Tell your chief of staff each morning what you wrote', kind:'Rewards the strategy work afterwards', back:'Each morning of strategy work builds the habit twice as fast. It does nothing until Sam does the first one.' },
-      c8:{ name:'Make "strategy first" your objective for the quarter', kind:'No change at the moment of choice', back:'At 08:00 and 22:30 both options take exactly the same effort as before.' },
+      c6:{ name:'Charge the phone outside the bedroom', kind:'Makes email in bed harder', back:'Email in bed takes 2.5 points more effort.' },
+      c7:{ name:'End the walk at the best coffee nearby', kind:'Rewards the walk afterwards', back:'Each walk builds the habit twice as fast. It does nothing until Sam takes the first one.' },
+      c8:{ name:'Make "more recovery" a personal objective for the quarter', kind:'No change at the moment of choice', back:'At 13:00 and 22:30 both options take exactly the same effort as before.' },
     },
     questions:[
-      'Name one behaviour your organisation needs more of this year. At the moment someone chooses, which option takes less effort?',
-      'Look at the programmes you are running to get that behaviour. Which of them change the steps people have to take, and which change how people feel about it?',
-      'Sam\'s evening habit changed after two nights at an offsite. Which disruptions coming up in your organisation, such as an office move, a restructure or a new system, could reset a habit in the same way?',
-      'On the slider, a fraction of a point separated no change from a complete change. Which of your initiatives might be stalled just short of that point?',
-    ],
-  },
-  ada:{
-    id:'ada', title:'Ada and the morning run',
-    summary:'A personal example: running before work and stopping late-night snacks.',
-    person:'Ada',
-    intro:'Ada wants to run before work and to stop eating late at night. At 07:00 she chooses between a run and the snooze button. At 22:30 she chooses between a snack and making tea and going to bed. Each time, she takes the option that needs less effort at that moment.',
-    am:{ time:'07:00', good:'Go for a run', bad:'Hit snooze',
-         goodPhrase:'going for a run', badPhrase:'hitting snooze', row:'Ran' },
-    pm:{ time:'22:30', good:'Make tea and go to bed', bad:'Eat a late snack',
-         goodPhrase:'making tea and going to bed', badPhrase:'eating a late snack', row:'No late snack' },
-    question:'If nothing around Ada changes, on how many of the next 14 mornings will she run?',
-    after:(am,pm)=>`Ran on ${am} of 14 mornings. A late snack on ${14-pm} of 14 nights. Ada wants both changes, and wanting them does not shorten either bar.`,
-    designIntro:'Each table chooses cards for Ada\'s environment. Cards cost 1 to 3 points. Before running, each table writes down how many mornings Ada will run and how many nights she will go to bed without a snack.',
-    events:{
-      hardAm1:'Rain. Running is harder this morning.',
-      away1:'Ada stays at her sister\'s. There are no snacks in the house.',
-      away2:'Second night at her sister\'s.',
-      weekend:'Weekend. No work, more time.',
-      hardAm2:'Heavy rain. Running is harder this morning.',
-      hardPm:'A bad day at work. The pull to snack is stronger tonight.',
-    },
-    cards:{
-      c1:{ name:'Lay out your running kit the night before', kind:'Makes running easier', back:'Running takes 3 points less effort. Fewer steps between waking and running.' },
-      c2:{ name:'Sleep in your running clothes', kind:'Makes running easier', back:'Running takes 2.5 points less effort.' },
-      c3:{ name:'Put your shoes by the front door', kind:'Makes running easier', back:'Running takes 1.5 points less effort.' },
-      c4:{ name:'Arrange to run with a friend at 07:00', kind:'Easier run and a harder snooze', back:'Running takes 2 points less effort and snoozing takes 2 points more. Someone is waiting.' },
-      c5:{ name:'Don\'t buy snacks on the weekly shop', kind:'Makes snacking harder', back:'A late snack takes 3.5 points more effort. The cupboard is empty.' },
-      c6:{ name:'Keep snacks in a closed tin on the top shelf', kind:'Makes snacking harder', back:'A late snack takes 2.5 points more effort.' },
-      c7:{ name:'Treat yourself to a good coffee after every run', kind:'Rewards running afterwards', back:'Each run builds the habit twice as fast. It does nothing until Ada goes on the first one.' },
-      c8:{ name:'Write a fitness goal on the fridge', kind:'No change at the moment of choice', back:'At 07:00 and 22:30 both options take exactly the same effort as before.' },
-    },
-    questions:[
-      'Name one behaviour your organisation needs more of this year. At the moment someone chooses, which option takes less effort?',
-      'Look at the programmes you are running to get that behaviour. Which of them change the steps people have to take, and which change how people feel about it?',
-      'Ada\'s evening habit changed after two nights at her sister\'s. Which disruptions coming up in your organisation, such as an office move, a restructure or a new system, could reset a habit in the same way?',
-      'On the slider, a fraction of a point separated no change from a complete change. Which of your initiatives might be stalled just short of that point?',
+      'Find the part of the day in your HRV report with the least recovery. What are you usually doing then, and which option takes less effort at that moment?',
+      'Think about recovery plans you have made before. Which of them changed the steps involved, and which changed only your intentions?',
+      'The offsite made Sam\'s evening email worse. Which weeks in your diary will do the same, and what could you set up before they start?',
+      'On quiet evenings, Sam stopped checking email only where a card had already made it harder. When are your quiet evenings, and is your environment ready for them?',
+      'On the slider, a fraction of a point separated no change from a complete change. Which recovery habit might be just short of that point for you?',
     ],
   },
 };
@@ -494,15 +457,11 @@ function go(step){
 
 /* ---------- 1. set up ---------- */
 function renderSetup(){
-  $('scenarioList').innerHTML = Object.values(SCENARIOS).map(s=>`
-    <label class="choice"><input type="radio" name="scn" value="${s.id}" ${s.id===S.scenario?'checked':''}>
-      <span><b>${esc(s.title)}</b><span class="small muted">${esc(s.summary)}</span></span></label>`).join('');
   $('countList').innerHTML = [1,2,3,4].map(n=>`
     <label><input type="radio" name="cnt" value="${n}" ${n===S.count?'checked':''}> ${n}</label>`).join('');
   $('nameList').innerHTML = tables().map(i=>`
     <label><span class="sw" style="background:${COLOURS[i]}"></span>
       <input type="text" value="${esc(S.names[i])}" data-i="${i}" aria-label="Name of table ${i+1}" maxlength="24"></label>`).join('');
-  document.querySelectorAll('input[name=scn]').forEach(r=>r.onchange=()=>{ S.scenario=r.value; resetPicks(); });
   document.querySelectorAll('input[name=cnt]').forEach(r=>r.onchange=()=>{ S.count=+r.value; renderSetup(); });
   document.querySelectorAll('#nameList input').forEach(inp=>inp.oninput=()=>{ S.names[+inp.dataset.i]=inp.value.trim()||`Table ${+inp.dataset.i+1}`; });
 }
@@ -576,8 +535,8 @@ function renderMatrix(){
     h+='</tr>';
   });
   h+='<tr class="sum"><td>Points left</td><td></td>'+T.map(i=>`<td class="tick">${MODEL.budget-spent(i)} of ${MODEL.budget}</td>`).join('')+'</tr>';
-  h+=`<tr class="pred"><td>Prediction: ${esc(s.am.row.toLowerCase())}, out of 14</td><td></td>`+T.map(i=>`<td class="tick"><input type="number" min="0" max="14" data-t="${i}" data-p="am" value="${S.preds[i].am??''}" aria-label="${esc(S.names[i])} prediction, mornings"></td>`).join('')+'</tr>';
-  h+=`<tr class="pred"><td>Prediction: ${esc(s.pm.row.toLowerCase())}, out of 14</td><td></td>`+T.map(i=>`<td class="tick"><input type="number" min="0" max="14" data-t="${i}" data-p="pm" value="${S.preds[i].pm??''}" aria-label="${esc(S.names[i])} prediction, evenings"></td>`).join('')+'</tr>';
+  h+=`<tr class="pred"><td>Prediction: ${esc(s.am.row.toLowerCase())}, out of 14</td><td></td>`+T.map(i=>`<td class="tick"><input type="number" min="0" max="14" data-t="${i}" data-p="am" value="${S.preds[i].am??''}" aria-label="${esc(S.names[i])} prediction, ${s.am.unit}"></td>`).join('')+'</tr>';
+  h+=`<tr class="pred"><td>Prediction: ${esc(s.pm.row.toLowerCase())}, out of 14</td><td></td>`+T.map(i=>`<td class="tick"><input type="number" min="0" max="14" data-t="${i}" data-p="pm" value="${S.preds[i].pm??''}" aria-label="${esc(S.names[i])} prediction, ${s.pm.unit}"></td>`).join('')+'</tr>';
   h+='</tbody>';
   $('matrix').innerHTML=h;
   $('matrix').querySelectorAll('input[type=checkbox]').forEach(cb=>cb.onchange=()=>{
@@ -697,7 +656,7 @@ function enterDebrief(){
   $('cardTable').innerHTML=h;
 
   $('sliderTitle').textContent='How much change does it take?';
-  $('sliderIntro').textContent=`No cards, the same fortnight. Drag the slider to take effort away from ${s.am.goodPhrase} and watch the mornings.`;
+  $('sliderIntro').textContent=`No cards, the same fortnight. Drag the slider to take effort away from ${s.am.goodPhrase} and watch what happens.`;
   $('sliderLabel').textContent=`Effort points removed from ${s.am.goodPhrase}`;
   const curve=[];
   for(let v=0; v<=6.0001; v+=0.25) curve.push({v, n:simulate([],[['amGood',-v]]).amCount});
@@ -705,7 +664,7 @@ function enterDebrief(){
   const firstSome=curve.find(c=>c.n>0);
   const firstAll=curve.find(c=>c.n===MODEL.days);
   $('sliderFinding').textContent = (lastZero && firstSome)
-    ? `Removing ${fmtQ(lastZero.v)} points changes nothing: 0 mornings out of 14. Removing ${fmtQ(firstSome.v)} points gives ${firstSome.n}.`+
+    ? `Removing ${fmtQ(lastZero.v)} points changes nothing: 0 ${s.am.unit} out of 14. Removing ${fmtQ(firstSome.v)} points gives ${firstSome.n}.`+
       (firstAll?` Removing ${fmtQ(firstAll.v)} gives all 14. `:' ')+
       `Once ${s.person} does it a few times, the habit makes it easier still, so a small push early in the fortnight has a large effect by the end.`
     : '';
@@ -713,7 +672,7 @@ function enterDebrief(){
   const draw=()=>{
     const v=+slider.value, r=simulate([],[['amGood',-v]]);
     $('sliderX').textContent=`${fmtQ(v)} points removed`;
-    $('sliderY').textContent=`${s.am.row}: ${r.amCount} of 14 mornings`;
+    $('sliderY').textContent=`${s.am.row}: ${r.amCount} of 14 ${s.am.unit}`;
     $('sliderCal').innerHTML=calHtml(r, MODEL.days, 'var(--ink)', ['am']);
     $('sliderChart').innerHTML=curveChart(curve, v);
   };
@@ -725,7 +684,7 @@ function enterDebrief(){
 function curveChart(curve, v){
   const W=600, H=200, L=40, R=20, Tp=14, B=30;
   const x=t=>L+(W-L-R)*t/6, y=n=>Tp+(H-Tp-B)*(1-n/14);
-  let g=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Mornings out of 14 against effort removed">`;
+  let g=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Days out of 14 against effort removed">`;
   [0,7,14].forEach(n=>{ g+=`<line x1="${L}" x2="${W-R}" y1="${y(n)}" y2="${y(n)}" stroke="#d6d1c7"/><text x="${L-8}" y="${y(n)+5}" font-size="13" fill="#555049" text-anchor="end">${n}</text>`; });
   [0,1,2,3,4,5,6].forEach(t=>{ g+=`<text x="${x(t)}" y="${H-8}" font-size="13" fill="#555049" text-anchor="middle">${t}</text>`; });
   let d=''; curve.forEach((c,i)=>{ d+=(i?` H${x(c.v)} V${y(c.n)}`:`M${x(c.v)},${y(c.n)}`); });
@@ -746,8 +705,8 @@ function buildPrint(){
     h+=`<div class="psheet"><h2>${esc(S.names[i])}: ${esc(s.title)}</h2>
       <p>Budget: ${MODEL.budget} points. Write down the cards you choose.</p>
       <div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
-      <p>Prediction. ${esc(s.am.row)}: how many of 14 mornings?</p><div class="line"></div>
-      <p>Prediction. ${esc(s.pm.row)}: how many of 14 nights?</p><div class="line"></div></div>`;
+      <p>Prediction. ${esc(s.am.row)}: how many of 14 ${s.am.unit}?</p><div class="line"></div>
+      <p>Prediction. ${esc(s.pm.row)}: how many of 14 ${s.pm.unit}?</p><div class="line"></div></div>`;
   });
   $('print').innerHTML=h;
 }
@@ -760,7 +719,7 @@ function check(){
     const cost=p.reduce((t,id)=>t+CARD_FX[id].cost,0);
     if(cost>MODEL.budget) continue;
     const r=simulate(p);
-    rows.push({cards:p.join(' '), cost, mornings:r.amCount, evenings:r.pmCount, total:r.amCount+r.pmCount});
+    rows.push({cards:p.join(' '), cost, lunchtime:r.amCount, evening:r.pmCount, total:r.amCount+r.pmCount});
   }
   rows.sort((a,b)=>b.total-a.total);
   console.table(rows);
