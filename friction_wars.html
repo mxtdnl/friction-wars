@@ -166,9 +166,8 @@ button{font-family:inherit}
 .lever .mod{font-family:var(--font-mono); font-size:.82rem; white-space:nowrap}
 .mod.down{color:var(--success)} .mod.up{color:var(--danger)} .mod.nil{color:var(--warning)}
 
-.sim-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-3)}
-.sim-grid.solo{grid-template-columns:1fr; max-width:820px; margin:0 auto}
-@media(max-width:980px){.sim-grid{grid-template-columns:1fr}}
+.sim-grid{display:grid; grid-template-columns:repeat(var(--cols,2),minmax(0,1fr)); gap:.6em}
+.sim-grid.solo{max-width:36em; margin:0 auto}
 .stage{background:var(--surface); border:2px solid var(--line); border-radius:var(--r-lg); padding:var(--sp-3); position:relative; overflow:hidden}
 .stage[data-team="A"]{border-top:6px solid var(--team-a)}
 .stage[data-team="B"]{border-top:6px solid var(--team-b)}
@@ -207,8 +206,6 @@ button{font-family:inherit}
 .design-box{margin:0 0 14px; padding:11px 14px; border-radius:var(--r-md);
   background:var(--surface-sunk); border:1px solid var(--line); border-left:4px solid var(--line-strong)}
 .design-box.empty{color:var(--ink-soft); font-style:italic; font-size:.9rem; line-height:1.35}
-.db-head{font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; font-weight:800;
-  color:var(--ink-soft); margin-bottom:7px}
 .db-item{font-size:.88rem; line-height:1.32; display:flex; gap:8px; align-items:baseline; margin-bottom:5px; color:var(--ink-soft)}
 .db-item:last-child{margin-bottom:0}
 .db-item .ar{font-family:var(--font-mono); font-weight:800; flex:0 0 auto; width:1.1em; text-align:center}
@@ -228,8 +225,6 @@ button{font-family:inherit}
 .term small{font-family:var(--font-body); font-size:.72rem; color:var(--ink-soft)}
 .term.easier{color:var(--success); border-color:color-mix(in srgb,var(--success) 45%,var(--line))}
 .term.harder{color:var(--danger);  border-color:color-mix(in srgb,var(--danger) 45%,var(--line))}
-.term.eq{background:var(--ink); color:var(--surface); border-color:var(--ink); font-weight:800}
-.term.eq small{color:var(--surface); opacity:.8}
 .pickpill{font-family:var(--font-mono); font-size:.76rem; color:var(--ink-soft); margin-left:auto; white-space:nowrap}
 
 .sim-legend{display:flex; gap:18px; flex-wrap:wrap; justify-content:center; align-items:center;
@@ -334,6 +329,10 @@ input[type=range]{width:100%; accent-color:var(--accent)}
    and everything inside is in em, so the whole screen shrinks until nothing scrolls. */
 .screen.fit{font-size:20px}
 .fitting .app{max-width:1880px}
+.fitting .app{padding-top:6px; padding-bottom:12px}
+.fitting .topbar{padding:4px 0 8px}
+.fitting .rail{margin-bottom:12px}
+.fitting .rail .step{padding-top:5px; padding-bottom:5px}
 .fit .fit-head{text-align:center; margin-bottom:.8em}
 .fit .fit-head .eyebrow{font-size:.7em}
 .fit .fit-head h1{font-size:1.5em; margin:.1em 0 .2em}
@@ -387,9 +386,54 @@ input[type=range]{width:100%; accent-color:var(--accent)}
 .notes{margin:var(--sp-2) 0 0; padding-left:1.2em}
 .notes li{margin-bottom:6px}
 
-.sim-grid.four{grid-template-columns:repeat(2,1fr)}
-@media(min-width:1600px){.sim-grid.four{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:760px){.sim-grid.four{grid-template-columns:1fr}}
+/* Simulation: fitted to the window like Cards and Choose (see fitSim), so everything is in em */
+#screen-sim .transport{margin:0 0 .45em; gap:.5em; font-size:.85em}
+#screen-sim .transport .btn{font-size:1em; padding:.55em 1.2em}
+#screen-sim .transport .dayflag{font-size:1.35em; min-width:8em}
+#screen-sim .timeline{max-width:none; margin:0 0 .5em; gap:.3em}
+#screen-sim .tl-day{gap:.1em}
+#screen-sim .tl-pair{gap:.15em}
+#screen-sim .tl-cell{height:1em; border-width:2px; border-radius:.2em}
+#screen-sim .tl-cell.cur{outline-width:.15em; outline-offset:.1em}
+#screen-sim .tl-n{font-size:.6em}
+#screen-sim .event-banner{max-width:none; margin:0 0 .5em; padding:.35em .8em; border-radius:.5em;
+  display:flex; flex-wrap:wrap; align-items:baseline; justify-content:center; gap:.15em .8em}
+#screen-sim .event-banner.none{font-size:.85em}
+#screen-sim .eb-tag{font-size:.7em}
+#screen-sim .eb-text{font-size:1em; margin:0}
+#screen-sim .eb-fx{font-size:.8em}
+#screen-sim .stage{padding:.45em .65em .55em; border-radius:.7em; border-top-width:.3em; display:flex; flex-direction:column; gap:.4em}
+#screen-sim .team-head{margin:0; gap:.1em .6em; flex-wrap:wrap; align-items:baseline}
+#screen-sim .team-name{font-size:1.15em; font-weight:800}
+#screen-sim .prob{font-family:var(--font-mono); font-weight:800; font-size:.78em; white-space:nowrap}
+#screen-sim .cue-line{display:none}
+#screen-sim .design-box{margin:0; padding:.3em .55em; border-radius:.45em; border-left-width:.2em}
+#screen-sim .design-box.empty{font-size:.78em}
+#screen-sim .db-item{font-size:.78em; margin-bottom:.15em; gap:.4em; align-items:center; white-space:nowrap}
+#screen-sim .db-item .db-l{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; color:var(--ink); font-weight:600}
+#screen-sim .db-n{font-family:var(--font-display); font-weight:800; color:var(--ink)}
+#screen-sim .db-tag{font-size:.8em; flex:0 0 auto}
+#screen-sim .candidate{margin:0; padding:.35em .55em .45em; border-radius:.55em}
+#screen-sim .cand-top{margin-bottom:.2em; gap:.4em}
+#screen-sim .cand-name{font-size:.88em; line-height:1.2}
+#screen-sim .tag-pill{font-size:.68em; padding:.1em .5em; margin-left:.4em}
+#screen-sim .sim-grid.four .tag-pill{display:none}
+#screen-sim .chosen-flag{font-size:.72em}
+#screen-sim .effbar-row{gap:.5em; margin-bottom:.3em}
+#screen-sim .effbar{height:1.1em}
+#screen-sim .net{font-size:1.15em; min-width:2.6em}
+#screen-sim .net small{font-size:.5em}
+#screen-sim .breakdown{gap:.25em}
+#screen-sim .term{font-size:.8em; padding:.08em .5em; border-width:1.5px}
+#screen-sim .term small{font-size:.9em}
+#screen-sim .meters{gap:.7em; margin:0}
+#screen-sim .meter .ml{font-size:.72em; margin-bottom:.15em}
+#screen-sim .meter .track{height:.55em}
+#screen-sim .sim-legend{max-width:none; margin:.5em 0 0; padding:.3em .9em; font-size:.75em; gap:.3em 1.2em}
+#screen-sim .sim-legend .swatch{width:1.6em; height:.7em}
+#screen-sim .sim-legend .tl-dot{width:.8em; height:.8em}
+html[data-theme="light"] #screen-sim .effbar > i:not(.win){background:var(--neutral-400)}
+
 
 /* Projector view: on whenever four teams play. The root size grows with the screen, so every
    rem-sized element grows with it; secondary text and lines get darker; nothing is set below .8rem. */
@@ -400,25 +444,7 @@ html.four[data-theme="dark"]{--ink-soft:#c9d2bf; --line:#46513f; --line-strong:#
 .four .app{max-width:1880px}
 .four .lede{max-width:62ch}
 .four .footnote{max-width:90ch}
-.four .timeline,.four .tl-key,.four .sim-legend,.four .event-banner{max-width:1400px}
-.four .tl-cell{height:30px; border-width:2px}
-.four .tl-n{font-size:.85rem; font-weight:700}
-.four .transport{position:sticky; top:0; z-index:5; background:var(--bg); padding:10px 0; margin-top:var(--sp-2)}
-.four .transport .dayflag{font-size:1.3rem; min-width:200px}
-.four .eb-tag,.four .eb-fx{font-size:.85rem}
-.four .stage{padding:var(--sp-2) var(--sp-3) var(--sp-3)}
-.four .stage .team-head{flex-wrap:wrap}
-.four .stage .team-name{font-size:1.35rem}
-.four .prob{font-family:var(--font-mono); font-weight:800; font-size:.9rem}
-.four .cue-line{display:none}
-.four .sim-grid.four .tag-pill{display:none}
-.four .chosen-flag,.four .chosen-flag,.four .db-head,.four .db-tag,.four .net small,
-.four .term small,.four .crown,.four .board th small{font-size:.8rem}
-.four .effbar{height:36px; border-width:1.5px}
-html.four[data-theme="light"] .effbar > i:not(.win){background:var(--neutral-400)}
-.four .net{font-size:1.35rem}
-.four .term{border-width:1.5px}
-.four .meter .track{height:18px}
+.four .crown,.four .board th small{font-size:.8rem}
 .four .debrief .d-item small{font-size:.9rem}
 </style>
 </head>
@@ -553,29 +579,24 @@ html.four[data-theme="light"] .effbar > i:not(.win){background:var(--neutral-400
   </section>
 
   <!-- SIMULATION -->
-  <section id="screen-sim" class="screen hidden">
-    <div class="center" style="margin-bottom:var(--sp-2)">
-      <div class="eyebrow">Simulation</div>
-      <h1 style="font-size:clamp(24px,3.2vw,36px)">Sam takes the shorter bar, every time</h1>
-    </div>
-    <div class="timeline" id="timeline" aria-label="Decisions in the fortnight"></div>
-    <div class="tl-key"><span><i class="tl-dot bad"></i> Disruption</span><span><i class="tl-dot good"></i> Helpful event</span><span>Click a square to jump to that decision</span></div>
+  <section id="screen-sim" class="screen fit hidden">
     <div class="transport">
       <button class="btn secondary" id="simPrev">Previous decision</button>
       <div class="dayflag" id="simDayFlag">Day 1</div>
       <button class="btn" id="simNext">Next decision</button>
       <button class="btn secondary" id="simSkip">Skip to results</button>
     </div>
+    <div class="timeline" id="timeline" aria-label="Decisions in the fortnight"></div>
     <div id="simEvent" aria-live="polite"></div>
-    <div class="sim-legend">
-      <span class="key"><span class="swatch win"></span> The shorter bar wins</span>
-      <span class="key"><span class="swatch easier"></span> lowers effort</span>
-      <span class="key"><span class="swatch harder"></span> raises effort</span>
-    </div>
     <div class="sim-grid" id="simGrid" aria-live="polite"></div>
-    <p class="footnote center" style="margin-left:auto;margin-right:auto">Each bar is the effort an option takes at that
-      moment: its <b>starting effort</b>, changed by <b>your cards</b>, the <b>habit</b> built up so far, the <b>time of
-      day</b> and anything happening <b>today</b>. Sam does whichever takes less.</p>
+    <div class="sim-legend">
+      <b>Sam takes the shorter bar, every time.</b>
+      <span class="key"><span class="swatch win"></span> Chosen</span>
+      <span class="key"><span class="swatch easier"></span> Lowers effort</span>
+      <span class="key"><span class="swatch harder"></span> Raises effort</span>
+      <span class="key"><i class="tl-dot bad"></i> Disruption</span>
+      <span class="key"><i class="tl-dot good"></i> Helpful event</span>
+    </div>
   </section>
 
   <!-- RESULT -->
@@ -774,10 +795,29 @@ function fitScreen(){
   const sec=document.querySelector('.screen.fit:not(.hidden)');
   document.documentElement.classList.toggle('fitting', !!sec);
   if(!sec) return;
+  if(sec.id==='screen-sim') fitSim(sec); else fitTo(sec, Math.min(30, Math.round(innerWidth/48)));
+}
+function fitTo(sec, px){
   const doc=document.documentElement, over=()=>doc.scrollHeight>doc.clientHeight || doc.scrollWidth>doc.clientWidth;
-  let px=Math.min(30, Math.round(innerWidth/48));
   sec.style.fontSize=px+'px';
   while(px>12 && over()){ px--; sec.style.fontSize=px+'px'; }
+  return px;
+}
+// fit every decision of the fortnight, so the text size stays put while stepping through it;
+// four teams try one row and a 2x2 grid and keep whichever allows the larger text
+function fitSim(sec){
+  const grid=$('simGrid'), keep=STATE.simIndex, n=STATE.sim.results[TEAM_KEYS()[0]].trace.length;
+  const layouts = innerWidth<700 ? [1] : isFour() ? [4,2] : [TEAM_KEYS().length];
+  let best=null;
+  layouts.forEach(cols=>{
+    grid.style.setProperty('--cols', cols);
+    let px=Math.min(30, Math.round(innerWidth/48));
+    for(let i=0; i<n; i++){ STATE.simIndex=i; renderSimStep(); px=fitTo(sec, px); }
+    if(!best || px>best.px) best={cols, px};
+  });
+  grid.style.setProperty('--cols', best.cols);
+  sec.style.fontSize=best.px+'px';
+  STATE.simIndex=keep; renderSimStep();
 }
 const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -944,7 +984,7 @@ function renderSimStep(){
     const walks=tr.slice(0,i+1).filter(x=>x.chosen===s.build).length;
     const offEmail=tr.slice(0,i+1).filter(x=>x.rows.some(r=>r.id===s.break) && x.chosen!==s.break).length;
     $('count-'+k).textContent=`Walks: ${walks} · Nights off email: ${offEmail}`;
-    $('design-'+k).innerHTML=designBoxHtml(s, STATE.teams[k].picks, t, isFour());
+    $('design-'+k).innerHTML=designBoxHtml(s, STATE.teams[k].picks, t);
     const wrap=$('cands-'+k); wrap.innerHTML='';
     const effs=t.rows.map(r=>r.eff);
     const eMin=Math.min(...effs), eMax=Math.max(...effs), range=Math.max(1.5,eMax-eMin);
@@ -958,7 +998,7 @@ function setMeter(k, which, v){
   $('m'+which+'-'+k).textContent=pct+'%';
   $('m'+which+'f-'+k).style.width=pct+'%';
 }
-function designBoxHtml(s, picks, t, compact){
+function designBoxHtml(s, picks, t){
   const items=[];
   t.rows.forEach(r=>{
     picks.forEach(id=>{
@@ -968,21 +1008,15 @@ function designBoxHtml(s, picks, t, compact){
       if(iv.target===r.id) c=iv.mod; else if(iv.mod2Target===r.id) c=iv.mod2;
       if(c===null) return;
       const kind = Math.abs(c)<0.05 ? 'flat' : (c<0?'easier':'harder');
-      items.push({label:iv.label, note:iv.note, kind, actionLabel:compact?r.short:r.label, tag:r.tag});
+      items.push({n:s.interventions.indexOf(iv)+1, label:iv.label, kind, actionLabel:r.short, tag:r.tag});
     });
   });
-  if(!items.length) return compact ? `<div class="design-box empty">None of this team's cards act here.</div>`
-    : `<div class="design-box empty">None of your cards act on this decision. Both options run on
-    starting effort, habit and time of day.</div>`;
+  if(!items.length) return `<div class="design-box empty">None of ${STATE.mode==='collaborative'?"the room's":"this team's"} cards act here.</div>`;
   const arrow={easier:'↓', harder:'↑', flat:'='};
-  // four teams side by side leave no room for the notes; the results screen repeats them
-  if(compact) return `<div class="design-box"><div class="db-head">Cards acting here</div>${items.map(it=>{
+  // one line per card, numbered as on the Cards screen; what each card did is on the results screen
+  return `<div class="design-box">${items.map(it=>{
     const tagCls = it.tag==='build'?'tag-build':it.tag==='break'?'tag-break':'neutral';
-    return `<div class="db-item ${it.kind}"><span class="ar">${arrow[it.kind]}</span><span><b>${it.label}</b> <span class="db-tag ${tagCls}">${it.actionLabel}</span></span></div>`;
-  }).join('')}</div>`;
-  return `<div class="design-box"><div class="db-head">Your cards at this decision</div>${items.map(it=>{
-    const tagCls = it.tag==='build'?'tag-build':it.tag==='break'?'tag-break':'neutral';
-    return `<div class="db-item ${it.kind}"><span class="ar">${arrow[it.kind]}</span><span><b>${it.label}.</b> ${it.note}<span class="db-tag ${tagCls}">${it.actionLabel}</span></span></div>`;
+    return `<div class="db-item ${it.kind}" title="${it.label}"><span class="ar">${arrow[it.kind]}</span><span class="db-n">${it.n}</span><span class="db-l">${it.label}</span><span class="db-tag ${tagCls}">${it.actionLabel}</span></div>`;
   }).join('')}</div>`;
 }
 function candidateEl(r, chosen, axisMin, axisMax){
@@ -996,7 +1030,6 @@ function candidateEl(r, chosen, axisMin, axisMax){
   if(r.habitBonus>0.05) terms.push(signed(-r.habitBonus,'habit'));
   if(r.drive>0.05) terms.push(signed(-r.drive,'time of day'));
   if(Math.abs(r.event)>0.05) terms.push(signed(r.event,'today').replace('class="term ','class="term today '));
-  terms.push(`<span class="term eq"><b>= ${r.eff.toFixed(1)}</b> <small>effort</small></span>`);
   el.innerHTML=`
     <div class="cand-top"><span class="cand-name">${r.label}${tagHtml}</span><span class="chosen-flag">Chosen</span></div>
     <div class="effbar-row">
@@ -1224,7 +1257,8 @@ function boot(){
   initStart();
   document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.goto)));
   bindSimTransport();
-  window.addEventListener('resize', fitScreen);
+  let resizeTimer;
+  window.addEventListener('resize', ()=>{ clearTimeout(resizeTimer); resizeTimer=setTimeout(fitScreen, 150); });
   document.addEventListener('keydown',e=>{
     if($('screen-sim').classList.contains('hidden') || e.target.tagName==='INPUT') return;
     if(e.key==='ArrowRight') $('simNext').click();
