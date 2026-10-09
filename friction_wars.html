@@ -43,6 +43,7 @@
   --seg-friction-down:var(--success);
   --seg-habit:var(--sage-500);
   --seg-drive:var(--warning);
+  --team-a:var(--series-build); --team-b:var(--series-break); --team-c:#2f6a9a; --team-d:#8a5f0a;
 
   
   --r-sm:8px; --r-md:14px; --r-lg:22px; --r-pill:999px;
@@ -60,6 +61,7 @@
   --series-build:var(--sage-300); --series-break:var(--purple-300);
   --seg-base:#6b7563; --seg-friction-up:#c9765c; --seg-friction-down:#7aa869;
   --seg-habit:var(--sage-400); --seg-drive:#cf9f52;
+  --team-c:#8cbbe0; --team-d:#e0b25e;
   --success:#7aa869; --success-soft:#2c3826;
   --warning:#cf9f52; --warning-soft:#3a3220;
   --danger:#c9765c;  --danger-soft:#3a2820;
@@ -168,8 +170,8 @@ button{font-family:inherit}
 .arena.solo{grid-template-columns:1fr; max-width:760px; margin:0 auto}
 @media(max-width:900px){.arena{grid-template-columns:1fr}}
 .team-panel{background:var(--surface); border:2px solid var(--line); border-radius:var(--r-lg); padding:var(--sp-3)}
-.team-panel[data-team="A"]{border-top:6px solid var(--series-build)}
-.team-panel[data-team="B"]{border-top:6px solid var(--series-break)}
+.team-panel[data-team="A"]{border-top:6px solid var(--team-a)}
+.team-panel[data-team="B"]{border-top:6px solid var(--team-b)}
 .team-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:var(--sp-2)}
 .team-name{font-family:var(--font-display); font-weight:800; font-size:1.3rem}
 .budget-badge{font-family:var(--font-mono); font-weight:800; padding:6px 12px; border-radius:var(--r-pill);
@@ -199,8 +201,10 @@ button{font-family:inherit}
 .sim-grid.solo{grid-template-columns:1fr; max-width:820px; margin:0 auto}
 @media(max-width:980px){.sim-grid{grid-template-columns:1fr}}
 .stage{background:var(--surface); border:2px solid var(--line); border-radius:var(--r-lg); padding:var(--sp-3); position:relative; overflow:hidden}
-.stage[data-team="A"]{border-top:6px solid var(--series-build)}
-.stage[data-team="B"]{border-top:6px solid var(--series-break)}
+.stage[data-team="A"]{border-top:6px solid var(--team-a)}
+.stage[data-team="B"]{border-top:6px solid var(--team-b)}
+.stage[data-team="C"]{border-top:6px solid var(--team-c)}
+.stage[data-team="D"]{border-top:6px solid var(--team-d)}
 .cue-line{display:flex; align-items:center; gap:10px; margin-bottom:12px}
 .cue-line .clock{font-family:var(--font-mono);font-weight:800;font-size:1.1rem;color:var(--accent);
   background:var(--surface-sunk);border:1.5px solid var(--line-strong);border-radius:var(--r-sm);padding:4px 10px}
@@ -361,6 +365,81 @@ input[type=range]{width:100%; accent-color:var(--accent)}
 .transport .btn:disabled{opacity:.4}
 @media(max-width:560px){.timeline{gap:2px} .tl-pair{gap:1px}}
 @media(max-width:560px){.week{grid-template-columns:repeat(2,1fr)} .app{padding-left:16px;padding-right:16px} .topbar,.brand{flex-wrap:wrap}}
+
+/* Four teams: one card list with a column per team */
+.matrix-wrap{background:var(--surface); border:2px solid var(--line); border-radius:var(--r-lg); padding:var(--sp-2) var(--sp-3)}
+@media(max-width:900px){.matrix-wrap{overflow-x:auto}}
+.matrix{width:100%; border-collapse:separate; border-spacing:0}
+.matrix th,.matrix td{padding:9px 10px; border-bottom:1.5px solid var(--line); text-align:center; vertical-align:middle}
+.matrix thead th{position:sticky; top:0; z-index:2; background:var(--surface); border-bottom:3px solid var(--line-strong); vertical-align:bottom}
+.matrix th.card,.matrix td.card{text-align:left}
+.matrix td.card{font-weight:600; line-height:1.3}
+.matrix .cost{font-family:var(--font-mono); font-weight:800; white-space:nowrap}
+.matrix tbody tr:hover td{background:var(--surface-sunk)}
+.matrix th.team{border-top:8px solid var(--tc); width:14%; min-width:7.5em}
+.matrix .name-input{width:100%; color:var(--tc); font-family:var(--font-display); font-weight:800; font-size:1.15rem; text-align:center}
+.matrix .budget-badge{display:inline-block; margin-top:8px; font-size:.95rem; padding:4px 12px}
+.mx-cell{width:56px; height:46px; border-radius:10px; border:2.5px solid var(--line-strong); background:var(--surface);
+  cursor:pointer; display:grid; place-items:center; margin:0 auto; padding:0}
+.mx-cell svg{width:26px; height:26px; stroke:#fff; fill:none; stroke-width:3.5; opacity:0}
+.mx-cell.on{background:var(--tc); border-color:var(--tc)}
+.mx-cell.on svg{opacity:1}
+[data-theme="dark"] .mx-cell svg{stroke:#1b201a}
+.mx-cell:disabled{opacity:.3; cursor:not-allowed}
+.matrix tfoot td{border-bottom:none; padding-top:12px; font-weight:700}
+.matrix tfoot tr:first-child td{border-top:3px solid var(--line-strong)}
+.matrix tfoot input{width:4.5em; font:inherit; font-weight:800; padding:6px; border:2px solid var(--line-strong); border-radius:var(--r-sm);
+  background:var(--surface); color:var(--ink); text-align:center}
+
+.board{width:100%; border-collapse:collapse; background:var(--surface); border:2px solid var(--line); border-radius:var(--r-lg); overflow:hidden}
+.board th,.board td{padding:14px 18px; text-align:center; border-bottom:1.5px solid var(--line)}
+.board th{font-size:.9rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); background:var(--surface-sunk)}
+.board th small{display:block; text-transform:none; letter-spacing:0; font-weight:600}
+.board td.team{text-align:left; font-family:var(--font-display); font-weight:800; font-size:1.4rem; border-left:8px solid var(--tc); color:var(--tc)}
+.board td.place{font-family:var(--font-display); font-weight:800; font-size:1.6rem}
+.board td.total{font-family:var(--font-display); font-weight:800; font-size:2.2rem; color:var(--accent)}
+.board td .mono{font-weight:800; font-size:1.2rem}
+.board td small{display:block; color:var(--ink-soft); font-size:.85rem}
+.board tr.first td{background:var(--surface-sunk)}
+.board tr:last-child td{border-bottom:none}
+@media(max-width:820px){.board th,.board td{padding:8px 6px}}
+
+.notes{margin:var(--sp-2) 0 0; padding-left:1.2em}
+.notes li{margin-bottom:6px}
+
+.sim-grid.four{grid-template-columns:repeat(2,1fr)}
+@media(min-width:1600px){.sim-grid.four{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:760px){.sim-grid.four{grid-template-columns:1fr}}
+
+/* Projector view: on whenever four teams play. The root size grows with the screen, so every
+   rem-sized element grows with it; secondary text and lines get darker; nothing is set below .8rem. */
+html.four{font-size:clamp(17px,1.1vw,22px)}
+html.four body{font-size:1rem}
+html.four[data-theme="light"]{--ink-soft:var(--neutral-700); --line:var(--neutral-300); --line-strong:var(--sage-500); --team-a:var(--sage-600)}
+html.four[data-theme="dark"]{--ink-soft:#c9d2bf; --line:#46513f; --line-strong:#62715a}
+.four .app{max-width:1880px}
+.four .lede{max-width:62ch}
+.four .footnote{max-width:90ch}
+.four .timeline,.four .tl-key,.four .sim-legend,.four .event-banner{max-width:1400px}
+.four .tl-cell{height:30px; border-width:2px}
+.four .tl-n{font-size:.85rem; font-weight:700}
+.four .transport{position:sticky; top:0; z-index:5; background:var(--bg); padding:10px 0; margin-top:var(--sp-2)}
+.four .transport .dayflag{font-size:1.3rem; min-width:200px}
+.four .eb-tag,.four .eb-fx{font-size:.85rem}
+.four .stage{padding:var(--sp-2) var(--sp-3) var(--sp-3)}
+.four .stage .team-head{flex-wrap:wrap}
+.four .stage .team-name{font-size:1.35rem}
+.four .prob{font-family:var(--font-mono); font-weight:800; font-size:.9rem}
+.four .cue-line{display:none}
+.four .sim-grid.four .tag-pill{display:none}
+.four .chosen-flag,.four .chosen-flag,.four .db-head,.four .db-tag,.four .net small,
+.four .term small,.four .crown,.four .board th small{font-size:.8rem}
+.four .effbar{height:36px; border-width:1.5px}
+html.four[data-theme="light"] .effbar > i:not(.win){background:var(--neutral-400)}
+.four .net{font-size:1.35rem}
+.four .term{border-width:1.5px}
+.four .meter .track{height:18px}
+.four .debrief .d-item small{font-size:.9rem}
 </style>
 </head>
 <body>
@@ -399,6 +478,11 @@ input[type=range]{width:100%; accent-color:var(--accent)}
             <div class="opt sel" data-mode="competitive" role="radio" aria-checked="true" tabindex="0">
               <span class="dot"></span>
               <div><b>Two teams</b><p>Each team designs Sam's environment with the same budget. The team whose Sam recovers more often wins.</p></div>
+            </div>
+            <div class="opt" data-mode="four" role="radio" aria-checked="false" tabindex="0">
+              <span class="dot"></span>
+              <div><b>Four teams</b><p>Four teams, same budget. The team whose Sam recovers most often wins. Text and
+                controls are enlarged for a projector.</p></div>
             </div>
             <div class="opt" data-mode="collaborative" role="radio" aria-checked="false" tabindex="0">
               <span class="dot"></span>
@@ -507,6 +591,7 @@ input[type=range]{width:100%; accent-color:var(--accent)}
       <div class="eyebrow">Results and debrief</div>
       <h1 style="font-size:clamp(26px,3.6vw,42px)">How often did Sam recover?</h1>
     </div>
+    <div id="leaderboard" class="hidden" style="margin-bottom:var(--sp-4)"></div>
     <div class="result-grid" id="resultGrid" aria-live="polite"></div>
     <div class="slab callout mt4" id="compareCallout"></div>
 
@@ -552,10 +637,10 @@ const SCENARIO = {
   buildLabel:'A lunchtime walk outside', buildSub:'Not a habit yet. Leaving the desk takes effort and the benefit is not felt straight away.',
   breakLabel:'Email in bed', breakSub:'Well established. One more look is always easy.',
   actions:{
-    walk:  {label:'Walk outside for 15 minutes',          base:6,   reward:0.45, init:0.05, tag:'build', drive:1.5},
-    desk:  {label:'Eat at the desk and keep working',     base:2,   reward:0.10, init:0.25, tag:null,    drive:0.5},
-    email: {label:'Check email in bed',                   base:2.5, reward:0.40, init:0.50, tag:'break', drive:1.5},
-    read:  {label:'Put the phone down, read, then sleep', base:3,   reward:0.60, init:0.10, tag:null,    drive:0},
+    walk:  {label:'Walk outside for 15 minutes',          short:'Walk',         base:6,   reward:0.45, init:0.05, tag:'build', drive:1.5},
+    desk:  {label:'Eat at the desk and keep working',     short:'Desk',         base:2,   reward:0.10, init:0.25, tag:null,    drive:0.5},
+    email: {label:'Check email in bed',                   short:'Email in bed', base:2.5, reward:0.40, init:0.50, tag:'break', drive:1.5},
+    read:  {label:'Put the phone down, read, then sleep', short:'Read',         base:3,   reward:0.60, init:0.10, tag:null,    drive:0},
   },
   slots:[
     {key:'lunch',   time:'13:00', cue:'Lunchtime, at the desk',     candidates:['walk','desk']},
@@ -643,7 +728,7 @@ function simulate(s, picks, extra){
       const evs=s.events.filter(e=>e.day===dp.day && e.slot===dp.slot && e.action===cid);
       const event=evs.reduce((t,e)=>t+e.mod,0);
       const eff=A.base+friction-habitBonus-A.drive+event;
-      return {id:cid, label:A.label, tag:A.tag, base:A.base, friction, habitBonus, drive:A.drive, event, eff};
+      return {id:cid, label:A.label, short:A.short, tag:A.tag, base:A.base, friction, habitBonus, drive:A.drive, event, eff};
     });
     // the lower effort wins; on a tie the old habit wins
     const [a,b]=rows;
@@ -662,20 +747,26 @@ function simulate(s, picks, extra){
 }
 
 /* ---------- UI state ---------- */
+const ALL_TEAMS = ['A','B','C','D'];
+const TEAM_SETS = { competitive:['A','B'], four:ALL_TEAMS, collaborative:['A'] };
+const defaultName = k => 'Team '+(ALL_TEAMS.indexOf(k)+1);
+const freshTeams = () => Object.fromEntries(ALL_TEAMS.map(k=>[k,{name:defaultName(k), picks:[], pred:{}}]));
 const STATE = {
   mode:'competitive',
-  teams:{ A:{name:'Team 1', picks:[], pred:{}}, B:{name:'Team 2', picks:[], pred:{}} },
+  teams:freshTeams(),
   sim:null, simIndex:0,
 };
-const TEAM_KEYS = () => STATE.mode==='competitive' ? ['A','B'] : ['A'];
+const TEAM_KEYS = () => TEAM_SETS[STATE.mode];
+const isFour = () => STATE.mode==='four';
 const teamName = k => STATE.mode==='collaborative' ? 'The room' : STATE.teams[k].name;
-const teamColour = k => k==='A' ? 'var(--series-build)' : 'var(--series-break)';
+const teamColour = k => 'var(--team-'+k.toLowerCase()+')';
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const $=id=>document.getElementById(id);
 
 /* ---------- screens ---------- */
 const SCREENS=['start','brief','design','sim','result'];
 function show(screen){
+  document.documentElement.classList.toggle('four', isFour() && screen!=='start');
   SCREENS.forEach(s=>$('screen-'+s).classList.toggle('hidden', s!==screen));
   document.querySelectorAll('.rail .step').forEach(el=>{
     const idx=SCREENS.indexOf(el.dataset.step), cur=SCREENS.indexOf(screen);
@@ -704,7 +795,7 @@ function selectMode(m){
 /* ---------- brief ---------- */
 function enterBrief(){
   const s=sc();
-  $('briefEyebrow').textContent='Brief · '+(STATE.mode==='competitive'?'Two teams':'Whole room');
+  $('briefEyebrow').textContent='Brief · '+{competitive:'Two teams', four:'Four teams', collaborative:'Whole room'}[STATE.mode];
   $('briefTitle').textContent=s.name;
   $('briefBlurb').textContent=s.blurb;
   $('briefBuild').textContent=s.buildLabel;
@@ -730,9 +821,15 @@ function enterBrief(){
 /* ---------- design ---------- */
 function enterDesign(){
   const arena=$('designArena');
-  arena.className='arena'+(STATE.mode==='collaborative'?' solo':'');
-  arena.innerHTML='';
-  TEAM_KEYS().forEach(k=>arena.appendChild(teamDesignPanel(k)));
+  if(isFour()){
+    arena.className='matrix-wrap';
+    arena.innerHTML=designMatrixHtml();
+  }else{
+    arena.className='arena'+(STATE.mode==='collaborative'?' solo':'');
+    arena.innerHTML='';
+    TEAM_KEYS().forEach(k=>arena.appendChild(teamDesignPanel(k)));
+  }
+  bindDesignInputs(arena);
   syncDesign();
   $('toSim').onclick=startSimulation;
 }
@@ -757,17 +854,44 @@ function teamDesignPanel(key){
       <label>Nights without email, out of 14 <input type="number" min="0" max="14" data-team="${key}" data-p="break" value="${team.pred.break??''}"></label>
     </div>`;
   panel.innerHTML=h;
-  panel.querySelectorAll('.pick').forEach(p=>{
+  return panel;
+}
+// four teams: one row per card, one column per team, so every label is printed once and large
+function designMatrixHtml(){
+  const s=sc(), keys=TEAM_KEYS();
+  const tick='<svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg>';
+  let h=`<table class="matrix"><thead><tr><th class="card">Card</th><th>Cost</th>`;
+  keys.forEach(k=>{ h+=`<th class="team" style="--tc:${teamColour(k)}">
+      <input class="name-input" value="${STATE.teams[k].name}" maxlength="20" aria-label="Name of ${defaultName(k)}" data-team="${k}">
+      <span class="budget-badge mono" id="badge-${k}"></span></th>`; });
+  h+=`</tr></thead><tbody>`;
+  s.interventions.forEach(iv=>{
+    h+=`<tr><td class="card">${iv.label}</td><td class="cost">${iv.cost} pt</td>`;
+    keys.forEach(k=>{ h+=`<td style="--tc:${teamColour(k)}"><button class="mx-cell" role="checkbox" aria-checked="false"
+      data-team="${k}" data-iv="${iv.id}" aria-label="${defaultName(k)}: ${iv.label}">${tick}</button></td>`; });
+    h+=`</tr>`;
+  });
+  h+=`</tbody><tfoot>`;
+  [['build','Predicted walks outside, out of 14'],['break','Predicted nights without email, out of 14']].forEach(([p,label])=>{
+    h+=`<tr><td class="card" colspan="2">${label}</td>`;
+    keys.forEach(k=>{ h+=`<td><input type="number" min="0" max="14" data-team="${k}" data-p="${p}" value="${STATE.teams[k].pred[p]??''}"
+      aria-label="${defaultName(k)}: ${label}"></td>`; });
+    h+=`</tr>`;
+  });
+  return h+`</tfoot></table>`;
+}
+function bindDesignInputs(root){
+  root.querySelectorAll('[data-iv]').forEach(p=>{
     const toggle=()=>togglePick(p.dataset.team,p.dataset.iv);
     p.addEventListener('click',toggle);
-    p.addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){e.preventDefault();toggle();} });
+    if(p.tagName!=='BUTTON') p.addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){e.preventDefault();toggle();} });
   });
-  panel.querySelectorAll('.preds input').forEach(inp=>inp.addEventListener('input',()=>{
+  root.querySelectorAll('input[data-p]').forEach(inp=>inp.addEventListener('input',()=>{
     STATE.teams[inp.dataset.team].pred[inp.dataset.p] = inp.value==='' ? undefined : clamp(Math.round(+inp.value),0,14);
   }));
-  const ni=panel.querySelector('.name-input');
-  if(ni) ni.addEventListener('input',()=>{ STATE.teams[key].name=ni.value.trim()||(key==='A'?'Team 1':'Team 2'); });
-  return panel;
+  root.querySelectorAll('.name-input').forEach(ni=>ni.addEventListener('input',()=>{
+    STATE.teams[ni.dataset.team].name=ni.value.trim()||defaultName(ni.dataset.team);
+  }));
 }
 function togglePick(key, id){
   const s=sc(), team=STATE.teams[key], idx=team.picks.indexOf(id);
@@ -782,14 +906,15 @@ function togglePick(key, id){
 function syncDesign(){
   const s=sc();
   TEAM_KEYS().forEach(k=>{
-    const panel=document.querySelector(`.team-panel[data-team="${k}"]`); if(!panel) return;
     const picks=STATE.teams[k].picks, spent=spentOf(k);
-    panel.querySelectorAll('.pick').forEach(p=>{
+    document.querySelectorAll(`#designArena [data-iv][data-team="${k}"]`).forEach(p=>{
       const on=picks.includes(p.dataset.iv), iv=s.interventions.find(x=>x.id===p.dataset.iv);
+      const off=!on && spent+iv.cost>MODEL.budget;
       p.classList.toggle('on',on); p.setAttribute('aria-checked',on);
-      p.classList.toggle('disabled', !on && spent+iv.cost>MODEL.budget);
+      if(p.tagName==='BUTTON') p.disabled=off; else p.classList.toggle('disabled',off);
     });
-    $('badge-'+k).textContent=`${MODEL.budget-spent} of ${MODEL.budget} pts left`;
+    const left=MODEL.budget-spent;
+    $('badge-'+k).textContent = isFour() ? `${left} pt${left===1?'':'s'} left` : `${left} of ${MODEL.budget} pts left`;
   });
 }
 
@@ -806,7 +931,7 @@ function startSimulation(){
 }
 function buildSimStages(){
   const grid=$('simGrid');
-  grid.className='sim-grid'+(STATE.mode==='collaborative'?' solo':'');
+  grid.className='sim-grid'+(STATE.mode==='collaborative'?' solo':'')+(isFour()?' four':'');
   grid.innerHTML='';
   TEAM_KEYS().forEach(k=>{
     const st=document.createElement('div'); st.className='stage'; st.dataset.team=k;
@@ -840,7 +965,7 @@ function renderSimStep(){
     const walks=tr.slice(0,i+1).filter(x=>x.chosen===s.build).length;
     const offEmail=tr.slice(0,i+1).filter(x=>x.rows.some(r=>r.id===s.break) && x.chosen!==s.break).length;
     $('count-'+k).textContent=`Walks: ${walks} · Nights off email: ${offEmail}`;
-    $('design-'+k).innerHTML=designBoxHtml(s, STATE.teams[k].picks, t);
+    $('design-'+k).innerHTML=designBoxHtml(s, STATE.teams[k].picks, t, isFour());
     const wrap=$('cands-'+k); wrap.innerHTML='';
     const effs=t.rows.map(r=>r.eff);
     const eMin=Math.min(...effs), eMax=Math.max(...effs), range=Math.max(1.5,eMax-eMin);
@@ -854,7 +979,7 @@ function setMeter(k, which, v){
   $('m'+which+'-'+k).textContent=pct+'%';
   $('m'+which+'f-'+k).style.width=pct+'%';
 }
-function designBoxHtml(s, picks, t){
+function designBoxHtml(s, picks, t, compact){
   const items=[];
   t.rows.forEach(r=>{
     picks.forEach(id=>{
@@ -864,12 +989,18 @@ function designBoxHtml(s, picks, t){
       if(iv.target===r.id) c=iv.mod; else if(iv.mod2Target===r.id) c=iv.mod2;
       if(c===null) return;
       const kind = Math.abs(c)<0.05 ? 'flat' : (c<0?'easier':'harder');
-      items.push({label:iv.label, note:iv.note, kind, actionLabel:r.label, tag:r.tag});
+      items.push({label:iv.label, note:iv.note, kind, actionLabel:compact?r.short:r.label, tag:r.tag});
     });
   });
-  if(!items.length) return `<div class="design-box empty">None of your cards act on this decision. Both options run on
+  if(!items.length) return compact ? `<div class="design-box empty">None of this team's cards act here.</div>`
+    : `<div class="design-box empty">None of your cards act on this decision. Both options run on
     starting effort, habit and time of day.</div>`;
   const arrow={easier:'↓', harder:'↑', flat:'='};
+  // four teams side by side leave no room for the notes; the results screen repeats them
+  if(compact) return `<div class="design-box"><div class="db-head">Cards acting here</div>${items.map(it=>{
+    const tagCls = it.tag==='build'?'tag-build':it.tag==='break'?'tag-break':'neutral';
+    return `<div class="db-item ${it.kind}"><span class="ar">${arrow[it.kind]}</span><span><b>${it.label}</b> <span class="db-tag ${tagCls}">${it.actionLabel}</span></span></div>`;
+  }).join('')}</div>`;
   return `<div class="design-box"><div class="db-head">Your cards at this decision</div>${items.map(it=>{
     const tagCls = it.tag==='build'?'tag-build':it.tag==='break'?'tag-break':'neutral';
     return `<div class="db-item ${it.kind}"><span class="ar">${arrow[it.kind]}</span><span><b>${it.label}.</b> ${it.note}<span class="db-tag ${tagCls}">${it.actionLabel}</span></span></div>`;
@@ -947,17 +1078,24 @@ function enterResult(){
   const grid=$('resultGrid');
   grid.className='result-grid'+(STATE.mode==='collaborative'?' solo':'');
   grid.innerHTML='';
-  const sums={}; TEAM_KEYS().forEach(k=>sums[k]=summary(k));
-  let winner=null;
-  if(STATE.mode==='competitive' && sums.A.total!==sums.B.total) winner = sums.A.total>sums.B.total?'A':'B';
-  TEAM_KEYS().forEach(k=>grid.appendChild(scorecard(k, sums[k], winner===k)));
-  $('compareCallout').innerHTML=comparisonText(sums, winner);
+  const keys=TEAM_KEYS(), sums={}; keys.forEach(k=>sums[k]=summary(k));
+  // every team on the top score wins, unless they all scored the same
+  let winners=[];
+  if(STATE.mode!=='collaborative'){
+    const top=Math.max(...keys.map(k=>sums[k].total));
+    winners=keys.filter(k=>sums[k].total===top);
+    if(winners.length===keys.length) winners=[];
+  }
+  keys.forEach(k=>grid.appendChild(scorecard(k, sums[k], winners.includes(k), winners.length>1)));
+  $('leaderboard').classList.toggle('hidden', !isFour());
+  $('leaderboard').innerHTML = isFour() ? leaderboardHtml(sums) : '';
+  $('compareCallout').innerHTML=comparisonText(sums, winners);
   renderSlider();
   $('questions').innerHTML=sc().questions.map(q=>`<li>${q}</li>`).join('');
   $('redesignBtn').onclick=()=>{ enterDesign(); show('design'); };
   $('newGameBtn').onclick=()=>{ resetGame(); show('start'); };
 }
-function scorecard(k, m, isWinner){
+function scorecard(k, m, isWinner, joint){
   const pred=STATE.teams[k].pred;
   const el=document.createElement('div'); el.className='scorecard'+(isWinner?' winner':'');
   const vs=(n,p)=> p===undefined ? '' : ` <small style="color:var(--ink-soft)">(predicted ${p})</small>`;
@@ -966,7 +1104,7 @@ function scorecard(k, m, isWinner){
     items+=`<div class="d-item ${iv.pseudo?'pseudo':''}"><span class="pr">${iv.label}</span><small>${iv.note}</small></div>`;
   });
   el.innerHTML=`
-    ${isWinner?'<span class="crown">Winner</span>':''}
+    ${isWinner?`<span class="crown">${joint?'Joint winner':'Winner'}</span>`:''}
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
       <span class="team-name" style="color:${teamColour(k)}">${teamName(k)}</span>
       <div style="text-align:right"><div class="grade">${m.total}</div><div style="color:var(--ink-soft);font-size:.85rem">recovery choices out of 28</div></div>
@@ -977,8 +1115,26 @@ function scorecard(k, m, isWinner){
       <div class="row"><span>With no changes</span><span class="mono">${STATE.sim.baseline.builds} and ${STATE.sim.baseline.breaks}</span></div>
       <div class="row"><span>Points on cards with little or no effect</span><span class="mono">${m.wasted} of ${m.spent}</span></div>
     </div>
+    ${isFour()?`<div class="debrief"><h4>What happened</h4><ul class="notes">${notesFor(k,m).map(x=>`<li>${x}</li>`).join('')}</ul></div>`:''}
     <div class="debrief"><h4>What each card did</h4>${items}</div>`;
   return el;
+}
+function leaderboardHtml(sums){
+  const keys=TEAM_KEYS().slice().sort((a,b)=>sums[b].total-sums[a].total);
+  const pred=(k,p)=>{ const v=STATE.teams[k].pred[p]; return v===undefined ? '' : `<small>predicted ${v}</small>`; };
+  let h=`<table class="board"><thead><tr><th>Place</th><th style="text-align:left">Team</th>
+    <th>Recovery choices<small>out of 28</small></th><th>Walks outside<small>out of 14</small></th>
+    <th>Nights without email<small>out of 14</small></th><th>Points on cards with little or no effect</th></tr></thead><tbody>`;
+  keys.forEach(k=>{
+    const m=sums[k], place=1+keys.filter(j=>sums[j].total>m.total).length;
+    h+=`<tr class="${place===1?'first':''}"><td class="place">${place}</td>
+      <td class="team" style="--tc:${teamColour(k)}">${teamName(k)}</td>
+      <td class="total">${m.total}</td>
+      <td><span class="mono">${m.r.builds}</span>${pred(k,'build')}</td>
+      <td><span class="mono">${m.r.breaks}</span>${pred(k,'break')}</td>
+      <td><span class="mono">${m.wasted} of ${m.spent}</span></td></tr>`;
+  });
+  return h+`</tbody></table>`;
 }
 function notesFor(k, m){
   const n=[], who=teamName(k);
@@ -996,7 +1152,18 @@ function notesFor(k, m){
   if(e && e>1) n.push(`For ${who}, the first night without email came on day ${e}.`);
   return n;
 }
-function comparisonText(sums, winner){
+function comparisonText(sums, winners){
+  if(isFour()){
+    const keys=TEAM_KEYS(), names=ks=>ks.map(teamName).join(', ').replace(/, ([^,]*)$/,' and $1');
+    if(!winners.length) return `<b>All four teams tied at ${sums.A.total}.</b> The same budget and the same fortnight gave
+      the same result. Each team's card below says what its design did.`;
+    const top=sums[winners[0]].total;
+    return (winners.length===1 ? `<b>${teamName(winners[0])} won with ${top} of 28.</b> `
+      : `<b>${names(winners)} shared first place with ${top} of 28.</b> `) +
+      `All four teams had the same budget and Sam faced the same fortnight, so every difference between them comes
+      from the cards. Each team's card below says what its design did.`;
+  }
+  const winner=winners[0]||null;
   if(STATE.mode==='collaborative'){
     const m=sums.A;
     return `<b>The room's design.</b> Sam walked on ${m.r.builds} of 14 days and stayed off email on ${m.r.breaks} of 14
@@ -1043,7 +1210,7 @@ function curveChart(curve, v, n){
   return g+'</svg>';
 }
 function resetGame(){
-  STATE.teams={A:{name:'Team 1',picks:[],pred:{}}, B:{name:'Team 2',picks:[],pred:{}}};
+  STATE.teams=freshTeams();
   STATE.sim=null; STATE.simIndex=0;
 }
 
