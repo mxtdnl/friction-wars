@@ -166,37 +166,6 @@ button{font-family:inherit}
 .lever .mod{font-family:var(--font-mono); font-size:.82rem; white-space:nowrap}
 .mod.down{color:var(--success)} .mod.up{color:var(--danger)} .mod.nil{color:var(--warning)}
 
-.arena{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-3)}
-.arena.solo{grid-template-columns:1fr; max-width:760px; margin:0 auto}
-@media(max-width:900px){.arena{grid-template-columns:1fr}}
-.team-panel{background:var(--surface); border:2px solid var(--line); border-radius:var(--r-lg); padding:var(--sp-3)}
-.team-panel[data-team="A"]{border-top:6px solid var(--team-a)}
-.team-panel[data-team="B"]{border-top:6px solid var(--team-b)}
-.team-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:var(--sp-2)}
-.team-name{font-family:var(--font-display); font-weight:800; font-size:1.3rem}
-.budget-badge{font-family:var(--font-mono); font-weight:800; padding:6px 12px; border-radius:var(--r-pill);
-  background:var(--surface-sunk); border:1.5px solid var(--line-strong)}
-.budget-badge.over{background:var(--danger-soft); border-color:var(--danger); color:var(--danger)}
-.pick-group{margin-bottom:14px}
-.pick-group > .glabel{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--ink-soft);margin-bottom:6px}
-.pick{
-  display:flex; gap:10px; align-items:center; padding:8px 10px; border-radius:var(--r-sm);
-  border:1.5px solid var(--line); margin-bottom:6px; cursor:pointer; transition:background .14s,border-color .14s;
-}
-.pick:hover{background:var(--surface-sunk)}
-.pick.on{border-color:var(--sage-500); background:var(--surface-sunk)}
-.pick.on.pseudo{border-color:var(--warning)}
-.pick .box{width:20px;height:20px;border-radius:6px;border:2px solid var(--line-strong);flex:0 0 auto;display:grid;place-items:center}
-.pick.on .box{background:var(--sage-500);border-color:var(--sage-500)}
-.pick.on.pseudo .box{background:var(--warning);border-color:var(--warning)}
-.pick .box svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:3;opacity:0}
-.pick.on .box svg{opacity:1}
-.pick .pl{flex:1}
-.pick .pl b{font-weight:600;font-size:.92rem}
-.pick .pl small{display:block;color:var(--ink-soft);font-size:.78rem}
-.pick .pc{font-family:var(--font-mono);font-weight:700;font-size:.85rem;color:var(--ink-soft);text-align:right}
-.pick.disabled{opacity:.4;pointer-events:none}
-
 .sim-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-3)}
 .sim-grid.solo{grid-template-columns:1fr; max-width:820px; margin:0 auto}
 @media(max-width:980px){.sim-grid{grid-template-columns:1fr}}
@@ -326,11 +295,6 @@ button{font-family:inherit}
 }
 .name-input{font:inherit; color:inherit; background:transparent; border:none; border-bottom:1.5px dashed var(--line-strong);
   width:10ch; padding:0}
-.preds{margin-top:var(--sp-2); padding-top:var(--sp-2); border-top:1.5px solid var(--line)}
-.preds .glabel{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--ink-soft);margin-bottom:6px}
-.preds label{display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:.92rem; margin-bottom:6px}
-.preds input{width:4.5em; font:inherit; padding:4px 6px; border:1.5px solid var(--line-strong); border-radius:var(--r-sm);
-  background:var(--surface); color:var(--ink); text-align:center}
 .slider-read{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; font-weight:700; margin:8px 0}
 input[type=range]{width:100%; accent-color:var(--accent)}
 .questions{margin:0; padding-left:1.3em}
@@ -366,30 +330,46 @@ input[type=range]{width:100%; accent-color:var(--accent)}
 @media(max-width:560px){.timeline{gap:2px} .tl-pair{gap:1px}}
 @media(max-width:560px){.week{grid-template-columns:repeat(2,1fr)} .app{padding-left:16px;padding-right:16px} .topbar,.brand{flex-wrap:wrap}}
 
-/* Four teams: one card list with a column per team */
-.matrix-wrap{background:var(--surface); border:2px solid var(--line); border-radius:var(--r-lg); padding:var(--sp-2) var(--sp-3)}
-@media(max-width:900px){.matrix-wrap{overflow-x:auto}}
-.matrix{width:100%; border-collapse:separate; border-spacing:0}
-.matrix th,.matrix td{padding:9px 10px; border-bottom:1.5px solid var(--line); text-align:center; vertical-align:middle}
-.matrix thead th{position:sticky; top:0; z-index:2; background:var(--surface); border-bottom:3px solid var(--line-strong); vertical-align:bottom}
-.matrix th.card,.matrix td.card{text-align:left}
-.matrix td.card{font-weight:600; line-height:1.3}
-.matrix .cost{font-family:var(--font-mono); font-weight:800; white-space:nowrap}
-.matrix tbody tr:hover td{background:var(--surface-sunk)}
-.matrix th.team{border-top:8px solid var(--tc); width:14%; min-width:7.5em}
-.matrix .name-input{width:100%; color:var(--tc); font-family:var(--font-display); font-weight:800; font-size:1.15rem; text-align:center}
-.matrix .budget-badge{display:inline-block; margin-top:8px; font-size:.95rem; padding:4px 12px}
-.mx-cell{width:56px; height:46px; border-radius:10px; border:2.5px solid var(--line-strong); background:var(--surface);
+/* Cards and Choose screens: sized to the window. fitScreen() sets the section's font size,
+   and everything inside is in em, so the whole screen shrinks until nothing scrolls. */
+.screen.fit{font-size:20px}
+.fitting .app{max-width:1880px}
+.fit .fit-head{text-align:center; margin-bottom:.8em}
+.fit .fit-head .eyebrow{font-size:.7em}
+.fit .fit-head h1{font-size:1.5em; margin:.1em 0 .2em}
+.fit .fit-head p{font-size:.85em; color:var(--ink-soft); margin:0 auto; max-width:70ch}
+.fit .row-actions{justify-content:center; margin-top:.9em; font-size:.85em}
+.fit .row-actions .btn{font-size:1em}
+.ocards{display:grid; grid-template-columns:repeat(6,1fr); gap:.6em}
+@media(max-aspect-ratio:6/5){.ocards{grid-template-columns:repeat(3,1fr)}}
+.ocard{background:var(--surface); border:2px solid var(--line); border-radius:.6em; padding:.55em .6em;
+  display:flex; gap:.55em; align-items:flex-start}
+.ocard .side{display:flex; flex-direction:column; align-items:center; gap:.25em; flex:0 0 auto}
+.ocard .num{font-family:var(--font-display); font-weight:800; width:1.8em; height:1.8em; border-radius:var(--r-pill);
+  display:grid; place-items:center; background:var(--ink); color:var(--surface)}
+.ocard .cost{font-family:var(--font-mono); font-weight:800; font-size:.8em; white-space:nowrap}
+.ocard .lbl{font-weight:600; line-height:1.28}
+
+.choose-wrap{background:var(--surface); border:2px solid var(--line); border-radius:.8em; padding:.5em .7em}
+.choose{width:100%; border-collapse:collapse}
+.choose th,.choose td{padding:.35em .2em; text-align:center; vertical-align:middle; border-bottom:1.5px solid var(--line)}
+.choose tr:last-child td{border-bottom:none}
+.choose th{font-weight:800; vertical-align:bottom}
+.choose th .n{display:block; font-family:var(--font-display); font-size:1em}
+.choose th .c{display:block; font-family:var(--font-mono); font-size:.7em; color:var(--ink-soft)}
+.choose th.lbl{font-size:.7em; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); line-height:1.2}
+.choose td.team{text-align:left; border-left:.35em solid var(--tc); padding-left:.6em; min-width:7em}
+.choose .name-input,.choose .room{width:7em; color:var(--tc); font-family:var(--font-display); font-weight:800; font-size:1.05em}
+.choose .budget-badge{font-size:.8em; padding:.25em .6em; white-space:nowrap}
+.choose input[type=number]{width:3.2em; font:inherit; font-weight:800; padding:.2em; border:2px solid var(--line-strong);
+  border-radius:var(--r-sm); background:var(--surface); color:var(--ink); text-align:center}
+.mx-cell{font-size:inherit; width:2.2em; height:2.2em; border-radius:.45em; border:2px solid var(--line-strong); background:var(--surface);
   cursor:pointer; display:grid; place-items:center; margin:0 auto; padding:0}
-.mx-cell svg{width:26px; height:26px; stroke:#fff; fill:none; stroke-width:3.5; opacity:0}
+.mx-cell svg{width:1.3em; height:1.3em; stroke:#fff; fill:none; stroke-width:3.5; opacity:0}
 .mx-cell.on{background:var(--tc); border-color:var(--tc)}
 .mx-cell.on svg{opacity:1}
 [data-theme="dark"] .mx-cell svg{stroke:#1b201a}
 .mx-cell:disabled{opacity:.3; cursor:not-allowed}
-.matrix tfoot td{border-bottom:none; padding-top:12px; font-weight:700}
-.matrix tfoot tr:first-child td{border-top:3px solid var(--line-strong)}
-.matrix tfoot input{width:4.5em; font:inherit; font-weight:800; padding:6px; border:2px solid var(--line-strong); border-radius:var(--r-sm);
-  background:var(--surface); color:var(--ink); text-align:center}
 
 .board{width:100%; border-collapse:collapse; background:var(--surface); border:2px solid var(--line); border-radius:var(--r-lg); overflow:hidden}
 .board th,.board td{padding:14px 18px; text-align:center; border-bottom:1.5px solid var(--line)}
@@ -456,9 +436,10 @@ html.four[data-theme="light"] .effbar > i:not(.win){background:var(--neutral-400
   <nav class="rail" aria-label="Progress">
     <div class="step" data-step="start"><span class="n">01</span> Set up</div>
     <div class="step" data-step="brief"><span class="n">02</span> Brief</div>
-    <div class="step" data-step="design"><span class="n">03</span> Design</div>
-    <div class="step" data-step="sim"><span class="n">04</span> Simulate</div>
-    <div class="step" data-step="result"><span class="n">05</span> Compare</div>
+    <div class="step" data-step="cards"><span class="n">03</span> Cards</div>
+    <div class="step" data-step="design"><span class="n">04</span> Choose</div>
+    <div class="step" data-step="sim"><span class="n">05</span> Simulate</div>
+    <div class="step" data-step="result"><span class="n">06</span> Compare</div>
   </nav>
 
   <!-- START -->
@@ -532,29 +513,41 @@ html.four[data-theme="light"] .effbar > i:not(.win){background:var(--neutral-400
       <div class="tl-key" id="briefKey" style="justify-content:flex-start;margin-left:0"></div>
       <div class="week" id="briefWeek"></div>
 
-      <div class="slab callout mt4">Each team gets the <b>same</b> budget and the <b>same</b> list of cards, shown when
-        you start designing. The cards are not labelled and the budget will not cover everything that works. Your task
+      <div class="slab callout mt4">Each team gets the <b>same</b> budget and the <b>same</b> list of cards, shown on the
+        next screen. The cards are not labelled and the budget will not cover everything that works. Your task
         is to decide which cards change the effort at 13:00 and 22:30, on the days that matter.</div>
 
       <div class="row-actions">
         <button class="btn secondary" data-goto="start">Back</button>
-        <button class="btn big" id="toDesign">Start designing</button>
+        <button class="btn big" id="toCards">See the cards</button>
       </div>
     </div>
   </section>
 
-  <!-- DESIGN -->
-  <section id="screen-design" class="screen hidden">
-    <div class="center" style="margin-bottom:var(--sp-3)">
-      <div class="eyebrow">Design</div>
-      <h1 style="font-size:clamp(26px,3.6vw,40px)">Spend the budget on Sam's environment</h1>
-      <p class="lede" style="margin:6px auto 0">The facilitator enters each team's choices. Cards you cannot afford are
-        greyed out. Before running, write down how often you expect Sam to recover.</p>
+  <!-- CARDS -->
+  <section id="screen-cards" class="screen fit hidden">
+    <div class="fit-head">
+      <div class="eyebrow">The cards</div>
+      <h1>Every change you can buy for Sam</h1>
+      <p id="cardsIntro"></p>
     </div>
-    <div id="designNote"></div>
-    <div class="arena" id="designArena"></div>
-    <div class="row-actions" style="justify-content:center">
+    <div class="ocards" id="cardGrid"></div>
+    <div class="row-actions">
       <button class="btn secondary" data-goto="brief">Back to brief</button>
+      <button class="btn big" id="toDesign">Enter team choices</button>
+    </div>
+  </section>
+
+  <!-- DESIGN -->
+  <section id="screen-design" class="screen fit hidden">
+    <div class="fit-head">
+      <div class="eyebrow">Choose</div>
+      <h1 id="designTitle">Enter each team's cards</h1>
+      <p id="designIntro"></p>
+    </div>
+    <div class="choose-wrap" id="designArena"></div>
+    <div class="row-actions">
+      <button class="btn secondary" data-goto="cards">Back to the cards</button>
       <button class="btn big" id="toSim">Run the fortnight</button>
     </div>
   </section>
@@ -764,7 +757,7 @@ const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const $=id=>document.getElementById(id);
 
 /* ---------- screens ---------- */
-const SCREENS=['start','brief','design','sim','result'];
+const SCREENS=['start','brief','cards','design','sim','result'];
 function show(screen){
   document.documentElement.classList.toggle('four', isFour() && screen!=='start');
   SCREENS.forEach(s=>$('screen-'+s).classList.toggle('hidden', s!==screen));
@@ -774,6 +767,17 @@ function show(screen){
     el.classList.toggle('done', idx<cur);
   });
   window.scrollTo({top:0, behavior: reduced()?'auto':'smooth'});
+  fitScreen();
+}
+// shrink a .fit screen's text until the page needs no scrolling; 12px is the floor on small screens
+function fitScreen(){
+  const sec=document.querySelector('.screen.fit:not(.hidden)');
+  document.documentElement.classList.toggle('fitting', !!sec);
+  if(!sec) return;
+  const doc=document.documentElement, over=()=>doc.scrollHeight>doc.clientHeight || doc.scrollWidth>doc.clientWidth;
+  let px=Math.min(30, Math.round(innerWidth/48));
+  sec.style.fontSize=px+'px';
+  while(px>12 && over()){ px--; sec.style.fontSize=px+'px'; }
 }
 const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -815,77 +819,54 @@ function enterBrief(){
     });
     c.innerHTML=h; w.appendChild(c);
   }
+  $('toCards').onclick=()=>{ enterCards(); show('cards'); };
+}
+
+/* ---------- cards ---------- */
+function enterCards(){
+  const s=sc();
+  $('cardsIntro').textContent=`${STATE.mode==='collaborative'?'The room has':'Every team has'} ${MODEL.budget} points. Note the numbers of the cards you want.`;
+  $('cardGrid').innerHTML=s.interventions.map((iv,i)=>`<div class="ocard">
+      <div class="side"><span class="num">${i+1}</span><span class="cost">${iv.cost} pt</span></div>
+      <div class="lbl">${iv.label}</div></div>`).join('');
   $('toDesign').onclick=()=>{ enterDesign(); show('design'); };
 }
 
 /* ---------- design ---------- */
 function enterDesign(){
   const arena=$('designArena');
-  if(isFour()){
-    arena.className='matrix-wrap';
-    arena.innerHTML=designMatrixHtml();
-  }else{
-    arena.className='arena'+(STATE.mode==='collaborative'?' solo':'');
-    arena.innerHTML='';
-    TEAM_KEYS().forEach(k=>arena.appendChild(teamDesignPanel(k)));
-  }
+  const room=STATE.mode==='collaborative';
+  $('designTitle').textContent = room ? "Enter the room's cards" : "Enter each team's cards";
+  $('designIntro').textContent = `Tick the card numbers ${room?'the room':'each team'} chose. Cards ${room?'the room':'a team'} cannot afford
+    are greyed out. Before running, enter the predictions: walks and nights without email, out of 14.`;
+  arena.innerHTML=chooseTableHtml();
   bindDesignInputs(arena);
   syncDesign();
   $('toSim').onclick=startSimulation;
 }
 function spentOf(k){ const s=sc(); return STATE.teams[k].picks.reduce((t,id)=>t+s.interventions.find(x=>x.id===id).cost,0); }
-function teamDesignPanel(key){
-  const s=sc(), team=STATE.teams[key];
-  const panel=document.createElement('div'); panel.className='team-panel'; panel.dataset.team=key;
-  let h=`<div class="team-head">
-      <span class="team-name" style="color:${teamColour(key)}">${STATE.mode==='collaborative'?'The room':
-        `<input class="name-input" value="${team.name}" maxlength="20" aria-label="Team name" data-team="${key}">`}</span>
-      <span class="budget-badge mono" id="badge-${key}"></span>
-    </div><div class="pick-group">`;
-  s.interventions.forEach(iv=>{
-    h+=`<div class="pick" data-team="${key}" data-iv="${iv.id}" role="checkbox" aria-checked="false" tabindex="0">
-      <span class="box"><svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg></span>
-      <span class="pl"><b>${iv.label}</b></span>
-      <span class="pc">${iv.cost} pt</span></div>`;
-  });
-  h+=`</div><div class="preds">
-      <div class="glabel">Your prediction</div>
-      <label>Walks outside, out of 14 <input type="number" min="0" max="14" data-team="${key}" data-p="build" value="${team.pred.build??''}"></label>
-      <label>Nights without email, out of 14 <input type="number" min="0" max="14" data-team="${key}" data-p="break" value="${team.pred.break??''}"></label>
-    </div>`;
-  panel.innerHTML=h;
-  return panel;
-}
-// four teams: one row per card, one column per team, so every label is printed once and large
-function designMatrixHtml(){
-  const s=sc(), keys=TEAM_KEYS();
+// one row per team, one column per card number, so every team's choices fit on one screen
+function chooseTableHtml(){
+  const s=sc(), room=STATE.mode==='collaborative';
   const tick='<svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6"/></svg>';
-  let h=`<table class="matrix"><thead><tr><th class="card">Card</th><th>Cost</th>`;
-  keys.forEach(k=>{ h+=`<th class="team" style="--tc:${teamColour(k)}">
-      <input class="name-input" value="${STATE.teams[k].name}" maxlength="20" aria-label="Name of ${defaultName(k)}" data-team="${k}">
-      <span class="budget-badge mono" id="badge-${k}"></span></th>`; });
-  h+=`</tr></thead><tbody>`;
-  s.interventions.forEach(iv=>{
-    h+=`<tr><td class="card">${iv.label}</td><td class="cost">${iv.cost} pt</td>`;
-    keys.forEach(k=>{ h+=`<td style="--tc:${teamColour(k)}"><button class="mx-cell" role="checkbox" aria-checked="false"
-      data-team="${k}" data-iv="${iv.id}" aria-label="${defaultName(k)}: ${iv.label}">${tick}</button></td>`; });
+  let h=`<table class="choose"><thead><tr><th class="lbl" style="text-align:left">Team</th>`;
+  s.interventions.forEach((iv,i)=>{ h+=`<th title="${iv.label}"><span class="n">${i+1}</span><span class="c">${iv.cost}pt</span></th>`; });
+  h+=`<th class="lbl">Points<br>left</th><th class="lbl">Walks<br>predicted</th><th class="lbl">Nights<br>predicted</th></tr></thead><tbody>`;
+  TEAM_KEYS().forEach(k=>{
+    const team=STATE.teams[k], tc=teamColour(k);
+    h+=`<tr style="--tc:${tc}"><td class="team">${room ? '<span class="room">The room</span>'
+      : `<input class="name-input" value="${team.name}" maxlength="20" aria-label="Name of ${defaultName(k)}" data-team="${k}">`}</td>`;
+    s.interventions.forEach((iv,i)=>{ h+=`<td><button class="mx-cell" role="checkbox" aria-checked="false" data-team="${k}"
+      data-iv="${iv.id}" title="${i+1}. ${iv.label}" aria-label="${teamName(k)}: card ${i+1}, ${iv.label}">${tick}</button></td>`; });
+    h+=`<td><span class="budget-badge mono" id="badge-${k}"></span></td>`;
+    ['build','break'].forEach(p=>{ h+=`<td><input type="number" min="0" max="14" data-team="${k}" data-p="${p}"
+      value="${team.pred[p]??''}" aria-label="${teamName(k)}: predicted ${p==='build'?'walks':'nights without email'}, out of 14"></td>`; });
     h+=`</tr>`;
   });
-  h+=`</tbody><tfoot>`;
-  [['build','Predicted walks outside, out of 14'],['break','Predicted nights without email, out of 14']].forEach(([p,label])=>{
-    h+=`<tr><td class="card" colspan="2">${label}</td>`;
-    keys.forEach(k=>{ h+=`<td><input type="number" min="0" max="14" data-team="${k}" data-p="${p}" value="${STATE.teams[k].pred[p]??''}"
-      aria-label="${defaultName(k)}: ${label}"></td>`; });
-    h+=`</tr>`;
-  });
-  return h+`</tfoot></table>`;
+  return h+`</tbody></table>`;
 }
 function bindDesignInputs(root){
-  root.querySelectorAll('[data-iv]').forEach(p=>{
-    const toggle=()=>togglePick(p.dataset.team,p.dataset.iv);
-    p.addEventListener('click',toggle);
-    if(p.tagName!=='BUTTON') p.addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){e.preventDefault();toggle();} });
-  });
+  root.querySelectorAll('[data-iv]').forEach(p=>p.addEventListener('click',()=>togglePick(p.dataset.team,p.dataset.iv)));
   root.querySelectorAll('input[data-p]').forEach(inp=>inp.addEventListener('input',()=>{
     STATE.teams[inp.dataset.team].pred[inp.dataset.p] = inp.value==='' ? undefined : clamp(Math.round(+inp.value),0,14);
   }));
@@ -909,12 +890,10 @@ function syncDesign(){
     const picks=STATE.teams[k].picks, spent=spentOf(k);
     document.querySelectorAll(`#designArena [data-iv][data-team="${k}"]`).forEach(p=>{
       const on=picks.includes(p.dataset.iv), iv=s.interventions.find(x=>x.id===p.dataset.iv);
-      const off=!on && spent+iv.cost>MODEL.budget;
       p.classList.toggle('on',on); p.setAttribute('aria-checked',on);
-      if(p.tagName==='BUTTON') p.disabled=off; else p.classList.toggle('disabled',off);
+      p.disabled = !on && spent+iv.cost>MODEL.budget;
     });
-    const left=MODEL.budget-spent;
-    $('badge-'+k).textContent = isFour() ? `${left} pt${left===1?'':'s'} left` : `${left} of ${MODEL.budget} pts left`;
+    $('badge-'+k).textContent=`${MODEL.budget-spent} of ${MODEL.budget}`;
   });
 }
 
@@ -1245,6 +1224,7 @@ function boot(){
   initStart();
   document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.goto)));
   bindSimTransport();
+  window.addEventListener('resize', fitScreen);
   document.addEventListener('keydown',e=>{
     if($('screen-sim').classList.contains('hidden') || e.target.tagName==='INPUT') return;
     if(e.key==='ArrowRight') $('simNext').click();
